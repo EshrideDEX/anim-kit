@@ -12,7 +12,7 @@ Tired Godot's current armature workflow? Well, it just got an upgrade! This plug
 - Quick bone selection via viewport
 - Full cutscene animation tools
 
-## Installatio
+## Installation
 1. Copy the `anim_kit/` folder into your Godot project’s `addons/` folder
 2. Enable the plugin in Project → Project Settings → Plugins
 
