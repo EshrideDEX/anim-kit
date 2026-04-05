@@ -2,8 +2,6 @@
 extends Control
 
 @onready var bone_list = $VBoxContainer/ScrollContainer/BoneList
-@onready var copy_btn = $VBoxContainer/HBoxContainer/Copy
-@onready var paste_btn = $VBoxContainer/HBoxContainer/Paste
 
 var skeleton: Skeleton3D
 var copied_transform: Transform3D
@@ -11,8 +9,6 @@ var copied_transform: Transform3D
 
 func _ready():
 	set_process(true)
-	copy_btn.pressed.connect(_on_copy_pressed)
-	paste_btn.pressed.connect(_on_paste_pressed)
 
 
 func _process(_delta):
@@ -53,7 +49,7 @@ func _get_selected_bone_index():
 	return selected[0]
 
 
-func _on_copy_pressed():
+func _on_copy_pressed() -> void:
 	if skeleton == null:
 		return
 
@@ -64,7 +60,7 @@ func _on_copy_pressed():
 	copied_transform = skeleton.get_bone_global_pose(bone_idx)
 
 
-func _on_paste_pressed():
+func _on_paste_pressed() -> void:
 	if skeleton == null:
 		return
 
