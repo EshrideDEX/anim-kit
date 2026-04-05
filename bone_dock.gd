@@ -2,13 +2,22 @@
 extends Control
 
 @onready var bone_list = $VBoxContainer/ScrollContainer/BoneList
+@onready var transform_panel: TabContainer = %TransformPanel
+@onready var copy_btn: Button = %Copy
+@onready var paste_btn: Button = %Paste
+@onready var trans_p_btn: Button = %TransP
 
 var skeleton: Skeleton3D
 var copied_transform: Transform3D
+var editor_main_screen: Control
 
 
 func _ready():
 	set_process(true)
+	editor_main_screen = EditorInterface.get_editor_main_screen()
+	
+	transform_panel.hide()
+	call_deferred("_setup_buttons")
 
 
 func _process(_delta):
@@ -73,3 +82,13 @@ func _on_paste_pressed() -> void:
 		return
 
 	skeleton.set_bone_global_pose(bone_idx, copied_transform)
+
+func _on_transform_panel_btn_toggled(pressed: bool) -> void:
+	transform_panel.visible = pressed
+
+func _setup_buttons():
+	copy_btn.icon = editor_main_screen.get_theme_icon("ActionCopy", "EditorIcons")
+	paste_btn.icon = editor_main_screen.get_theme_icon("ActionPaste", "EditorIcons")
+
+	copy_btn.text = ""
+	paste_btn.text = ""
