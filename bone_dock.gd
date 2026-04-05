@@ -19,14 +19,18 @@ func _process(_delta):
 func _update_skeleton():
 	var selection = EditorInterface.get_selection()
 	var nodes = selection.get_selected_nodes()
+	var skeleton_selected = false
 	
 	skeleton = null
 
 	for node in nodes:
 		if node is Skeleton3D:
 			skeleton = node
+			skeleton_selected = true
 			#print("Found Skeleton: %s" % skeleton)
-			return
+			break
+	
+	visible = skeleton_selected
 
 
 func _update_bone_list():

@@ -48,13 +48,13 @@ alignment = 1
 [node name="Copy" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1685488718]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Copy the transform of a bone."
+tooltip_text = "Copy the transform of a bone"
 text = "C"
 
 [node name="Paste" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2134506023]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Paste the transform of a bone."
+tooltip_text = "Paste the transform of a bone"
 text = "P"
 
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
