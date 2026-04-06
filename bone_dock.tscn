@@ -99,6 +99,7 @@ Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
 }
 
 [node name="BoneDock" type="Control" unique_id=912353562]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -132,83 +133,95 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 10
+theme_override_font_sizes/font_size = 12
 auto_width = true
 auto_height = true
 
 [node name="TransformPanel" type="TabContainer" parent="VBoxContainer" unique_id=100526944]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(100, 128)
+custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 14
 theme_override_styles/tab_unselected = SubResource("StyleBoxFlat_ty8x4")
 theme_override_styles/tab_hovered = SubResource("StyleBoxFlat_itgml")
 theme_override_styles/tab_selected = SubResource("StyleBoxFlat_lkpb2")
 theme_override_styles/tab_disabled = SubResource("StyleBoxFlat_2v8dt")
 theme_override_styles/tab_focus = SubResource("StyleBoxFlat_gqbsy")
+tab_alignment = 1
 current_tab = 0
-tab_0/title = "L"
-tab_1/title = "R"
-tab_2/title = "S"
+tab_0/title = "Location"
+tab_1/title = "Rotation"
+tab_2/title = "Scale"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TransformPanel" unique_id=1304122866]
 clip_contents = true
 layout_mode = 2
 theme_override_constants/separation = 2
+alignment = 1
 metadata/_tab_index = 0
-metadata/_tab_name = "L"
+metadata/_tab_name = "Location"
 
 [node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer" unique_id=1026131957]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 16
 text = "Location"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer/TransformPanel/VBoxContainer" unique_id=160744141]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer" unique_id=460318229]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer" unique_id=1838152501]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer" unique_id=460318229]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer" unique_id=1437472464]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=1437472464]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.99999887, 0.28173995, 0.3597019, 1)
 theme_override_font_sizes/font_size = 14
 text = "x"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer" unique_id=194823508]
+[node name="LocX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=194823508]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+emoji_menu_enabled = false
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer" unique_id=1611602337]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer" unique_id=1611602337]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer2" unique_id=982037363]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=982037363]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.44842535, 0.7254196, 2.3102762e-06, 1)
 theme_override_font_sizes/font_size = 14
 text = "y"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer2" unique_id=319463707]
+[node name="LocY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=319463707]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer" unique_id=1162606662]
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer" unique_id=1162606662]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer3" unique_id=1747074589]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer3" unique_id=1747074589]
 layout_mode = 2
 theme_override_colors/font_color = Color(5.583167e-06, 0.714586, 0.8246825, 1)
 theme_override_font_sizes/font_size = 14
 text = "z"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer3" unique_id=1757294093]
+[node name="LocZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer3" unique_id=1757294093]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
@@ -219,58 +232,66 @@ clip_contents = true
 layout_mode = 2
 theme_override_constants/separation = 2
 metadata/_tab_index = 1
-metadata/_tab_name = "R"
+metadata/_tab_name = "Rotation"
 
 [node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer2" unique_id=456462599]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 16
 text = "Rotate (Euler)"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer/TransformPanel/VBoxContainer2" unique_id=1419168809]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer2" unique_id=1813072441]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer2" unique_id=1271477606]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer" unique_id=2146756784]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer" unique_id=575275225]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer" unique_id=1460709921]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.99999887, 0.28173995, 0.3597019, 1)
 theme_override_font_sizes/font_size = 14
 text = "x"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer" unique_id=874242270]
+[node name="RotX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer" unique_id=912391432]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer2" unique_id=2058522693]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer" unique_id=1048863727]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer2" unique_id=168541985]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer2" unique_id=1769507420]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.44842535, 0.7254196, 2.3102762e-06, 1)
 theme_override_font_sizes/font_size = 14
 text = "y"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer2" unique_id=381670848]
+[node name="RotY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer2" unique_id=1026710991]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer2" unique_id=989184877]
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer" unique_id=1692547471]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer3" unique_id=977728280]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer3" unique_id=899649492]
 layout_mode = 2
 theme_override_colors/font_color = Color(5.583167e-06, 0.714586, 0.8246825, 1)
 theme_override_font_sizes/font_size = 14
 text = "z"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer3" unique_id=747635238]
+[node name="RotZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer3" unique_id=1606959348]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
@@ -281,58 +302,66 @@ clip_contents = true
 layout_mode = 2
 theme_override_constants/separation = 2
 metadata/_tab_index = 2
-metadata/_tab_name = "S"
+metadata/_tab_name = "Scale"
 
 [node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer3" unique_id=1333071049]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 16
 text = "Scale"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer/TransformPanel/VBoxContainer3" unique_id=406216313]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer3" unique_id=300461889]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer3" unique_id=817383673]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer" unique_id=627632479]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer" unique_id=167656539]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer" unique_id=1781269]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.99999887, 0.28173995, 0.3597019, 1)
 theme_override_font_sizes/font_size = 14
 text = "x"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer" unique_id=1281590352]
+[node name="ScaX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer" unique_id=1171731612]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer3" unique_id=314508532]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer" unique_id=1199469759]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer2" unique_id=399485198]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer2" unique_id=1653434]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.44842535, 0.7254196, 2.3102762e-06, 1)
 theme_override_font_sizes/font_size = 14
 text = "y"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer2" unique_id=1571333816]
+[node name="ScaY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer2" unique_id=1002569506]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer3" unique_id=1294874850]
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer" unique_id=383789471]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer3" unique_id=476573271]
+[node name="Label" type="Label" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer3" unique_id=316110378]
 layout_mode = 2
 theme_override_colors/font_color = Color(5.583167e-06, 0.714586, 0.8246825, 1)
 theme_override_font_sizes/font_size = 14
 text = "z"
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer3" unique_id=1202511070]
+[node name="ScaZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer3" unique_id=1754223839]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
@@ -362,6 +391,7 @@ theme_override_font_sizes/font_size = 12
 toggle_mode = true
 text = "TransP"
 
+[connection signal="item_selected" from="VBoxContainer/ScrollContainer/BoneList" to="." method="_on_bone_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Paste" to="." method="_on_paste_pressed"]
 [connection signal="toggled" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]
