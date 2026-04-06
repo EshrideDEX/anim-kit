@@ -62,6 +62,7 @@ func _on_focus_lost(node: LineEdit, type: String, axis: String):
 func _process(_delta):
 	_update_skeleton()
 	_update_bone_list()
+	_check_bone_external_transform_change()
 
 
 func _update_skeleton():
@@ -167,9 +168,31 @@ func _on_transform_changed(new_text: String, type: String, axis: String) -> void
 	match type:
 		"loc": current_location[axis] = val
 		"rot": current_euler[axis] = val
-		"sca": current_scale[axis] = max(val, 0.001) # Safety clamp
+		"sca": current_scale[axis] = max(val, 0.001) # Safety clamp so scale won't reach 0
 	
 	_apply_transform()
+
+func _check_bone_external_transform_change():
+	if bone_idx == -1 or skeleton == null:
+		return
+	
+	var transform = skeleton.get_bone_pose(bone_idx)
+	var bone_loc = transform.origin
+	var bone_scale = transform.basis.get_scale()
+	var bone_euler = transform.basis.get_euler() * 180.0 / PI
+	
+	# Only update transforms when user is not actively editing fields
+	for key in transform_fields:
+		var nodes = transform_fields[key]
+		for node in nodes:
+			if node.has_focus():
+				return
+	# Check if anything changed
+	if bone_loc != current_location or bone_scale != current_scale or bone_euler != current_euler:
+		current_location = bone_loc
+		current_scale = bone_scale
+		current_euler = bone_euler
+		_update_current_transform()
 
 func _apply_transform(live := true) -> void:
 	if bone_idx == -1:
