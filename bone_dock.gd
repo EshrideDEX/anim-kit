@@ -123,7 +123,7 @@ func _on_copy_pressed() -> void:
 	if bone_idx == -1:
 		return
 
-	copied_transform = skeleton.get_bone_pose(bone_idx)
+	copied_transform = skeleton.get_bone_global_pose(bone_idx)
 
 func _on_paste_pressed() -> void:
 	if skeleton == null:
@@ -135,10 +135,20 @@ func _on_paste_pressed() -> void:
 
 	var undo_redo = EditorInterface.get_editor_undo_redo()
 
-	var old_transform = skeleton.get_bone_pose(bone_idx)
-	var new_transform = copied_transform
+	var old_transform: Transform3D = skeleton.get_bone_pose(bone_idx)
 
-	undo_redo.create_action("Paste Bone Transform")
+	# Convert copied GLOBAL → LOCAL
+	var parent_idx: int = skeleton.get_bone_parent(bone_idx)
+	var new_transform: Transform3D
+
+	if parent_idx == -1:
+		# Root bone
+		new_transform = copied_transform
+	else:
+		var parent_global: Transform3D = skeleton.get_bone_global_pose(parent_idx)
+		new_transform = parent_global.affine_inverse() * copied_transform
+
+	undo_redo.create_action("Paste Bone Transform (World)")
 
 	undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
 	undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
