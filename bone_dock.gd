@@ -147,7 +147,8 @@ func _on_paste_pressed() -> void:
 	else:
 		var parent_global: Transform3D = skeleton.get_bone_global_pose(parent_idx)
 		new_transform = parent_global.affine_inverse() * copied_transform
-
+	
+	# Paste undo/redo
 	undo_redo.create_action("Paste Bone Transform (World)")
 
 	undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
@@ -157,6 +158,79 @@ func _on_paste_pressed() -> void:
 	undo_redo.add_undo_method(self, "_update_current_transform")
 
 	undo_redo.commit_action()
+
+func _on_paste_mirrored_pressed() -> void:
+	if skeleton == null:
+		return
+
+	var bone_idx = _get_selected_bone_index()
+	if bone_idx == -1:
+		return
+
+	var bone_name = skeleton.get_bone_name(bone_idx)
+	var target_name = _get_mirrored_bone_name(bone_name)
+
+	var target_idx = skeleton.find_bone(target_name)
+	if target_idx == -1:
+		print("No mirrored bone found for: ", bone_name)
+		return
+
+	var undo_redo = EditorInterface.get_editor_undo_redo()
+	var old_transform: Transform3D = skeleton.get_bone_pose(target_idx)
+	var mirrored_global: Transform3D = _mirror_transform_x(copied_transform)
+	
+	# Convert copied GLOBAL → LOCAL
+	var parent_idx: int = skeleton.get_bone_parent(target_idx)
+	var new_transform: Transform3D
+
+	if parent_idx == -1:
+		new_transform = mirrored_global
+	else:
+		var parent_global: Transform3D = skeleton.get_bone_global_pose(parent_idx)
+		new_transform = parent_global.affine_inverse() * mirrored_global
+
+	# Paste mirrored undo/redo
+	undo_redo.create_action("Paste Mirrored Bone Transform")
+
+	undo_redo.add_do_method(skeleton, "set_bone_pose", target_idx, new_transform)
+	undo_redo.add_undo_method(skeleton, "set_bone_pose", target_idx, old_transform)
+
+	undo_redo.add_do_method(self, "_update_current_transform")
+	undo_redo.add_undo_method(self, "_update_current_transform")
+
+	undo_redo.commit_action()
+
+func _on_paste_button_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		if Input.is_key_pressed(KEY_SHIFT):
+			_on_paste_mirrored_pressed()
+		else:
+			_on_paste_pressed()
+
+func _get_mirrored_bone_name(name: String) -> String:
+	if name.contains("L"):
+		return name.replace("L", "R")
+	elif name.contains("R"):
+		return name.replace("R", "L")
+	return name
+
+func _mirror_transform_x(t: Transform3D) -> Transform3D:
+	# Mirror matrix (flip X axis)
+	var mirror := Basis(
+		Vector3(-1, 0, 0),
+		Vector3(0, 1, 0),
+		Vector3(0, 0, 1)
+	)
+
+	var mirrored := Transform3D()
+
+	# Mirror position
+	mirrored.origin = mirror * t.origin
+
+	# Mirror rotation properly
+	mirrored.basis = mirror * t.basis * mirror
+
+	return mirrored
 
 ##------------------Handle Transforms--------------------##
 

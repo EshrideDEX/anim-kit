@@ -381,17 +381,19 @@ icon = SubResource("DPITexture_ty8x4")
 [node name="Paste" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2134506023]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Paste the transform of a bone"
+tooltip_text = "Paste the transform of a bone
+(Hold SHIFT to paste flipped)"
 icon = SubResource("DPITexture_itgml")
 
 [node name="TransP" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=933207483]
 unique_name_in_owner = true
 layout_mode = 2
+tooltip_text = "Toggle the Transform Panel"
 theme_override_font_sizes/font_size = 12
 toggle_mode = true
 text = "TransP"
 
 [connection signal="item_selected" from="VBoxContainer/ScrollContainer/BoneList" to="." method="_on_bone_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/Paste" to="." method="_on_paste_pressed"]
-[connection signal="toggled" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]
+[connection signal="gui_input" from="VBoxContainer/HBoxContainer/Paste" to="." method="_on_paste_button_gui_input"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]
