@@ -18,6 +18,9 @@ var copied_transform: Transform3D
 var edit_start_transform: Transform3D
 var editor_main_screen: Control
 
+var dragging := false
+var last_drag_x := 0
+
 var bone_idx: int
 
 var current_location: Vector3
@@ -40,8 +43,16 @@ func _ready():
 			var node = get_node("%" + node_name)
 			
 			node.text_submitted.connect(_on_transform_changed.bind(type, axis))
-			node.focus_entered.connect(_on_focus_entered.bind(node))
+			node.focus_entered.connect(_on_focus_entered.bind(node, type, axis))
 			node.focus_exited.connect(_on_focus_lost.bind(node, type, axis))
+			node.gui_input.connect(_on_line_edit_gui_input.bind(type, axis, node))
+
+func _process(_delta):
+	_update_skeleton()
+	_update_bone_list()
+	_check_bone_external_transform_change()
+
+##------------------Handle Focus--------------------##
 
 func _on_focus_entered(node: LineEdit) -> void:
 	if skeleton == null:
@@ -59,11 +70,7 @@ func _on_focus_lost(node: LineEdit, type: String, axis: String):
 	
 	_apply_transform(false)
 
-func _process(_delta):
-	_update_skeleton()
-	_update_bone_list()
-	_check_bone_external_transform_change()
-
+##------------------Updates--------------------##
 
 func _update_skeleton():
 	var selection = EditorInterface.get_selection()
@@ -94,6 +101,7 @@ func _update_bone_list():
 			bone_list.add_item(skeleton.get_bone_name(i))
 	
 
+##------------------Bone Selection--------------------##
 
 func _get_selected_bone_index():
 	var selected = bone_list.get_selected_items()
@@ -105,6 +113,8 @@ func _on_bone_selected(index: int) -> void:
 	bone_idx = index
 	_update_current_transform()
 
+##------------------Copy/Paste--------------------##
+
 func _on_copy_pressed() -> void:
 	if skeleton == null:
 		return
@@ -114,7 +124,6 @@ func _on_copy_pressed() -> void:
 		return
 
 	copied_transform = skeleton.get_bone_pose(bone_idx)
-
 
 func _on_paste_pressed() -> void:
 	if skeleton == null:
@@ -134,10 +143,12 @@ func _on_paste_pressed() -> void:
 	undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
 	undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
 
+	undo_redo.add_do_method(self, "_update_current_transform")
+	undo_redo.add_undo_method(self, "_update_current_transform")
+
 	undo_redo.commit_action()
 
-func _on_transform_panel_btn_toggled(pressed: bool) -> void:
-	transform_panel.visible = pressed
+##------------------Handle Transforms--------------------##
 
 func _update_current_transform():
 	if bone_idx == -1 or skeleton == null:
@@ -221,6 +232,32 @@ func _commit_transform_with_undo(new_transform: Transform3D) -> void:
 	undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
 
 	undo_redo.commit_action()
+
+##------------------Gestures--------------------##
+func _on_line_edit_gui_input(event: InputEvent, type: String, axis: String, node: LineEdit) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			_increment_field(node, type, axis, 1.0)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			_increment_field(node, type, axis, -1.0)
+
+func _increment_field(node: LineEdit, type: String, axis: String, delta: float):
+	if not node.text.is_valid_float():
+		return
+	
+	var value = float(node.text)
+	value += delta
+	
+	if type == "sca":
+		value = max(value, 0.001)
+	
+	node.text = str(snapped(value, 0.001))
+	_on_transform_changed(node.text, type, axis)
+
+##------------------Additional Setup--------------------##
+
+func _on_transform_panel_btn_toggled(pressed: bool) -> void:
+	transform_panel.visible = pressed
 
 func _setup_buttons():
 	copy_btn.icon = editor_main_screen.get_theme_icon("ActionCopy", "EditorIcons")

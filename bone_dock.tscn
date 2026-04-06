@@ -187,7 +187,7 @@ theme_override_colors/font_color = Color(0.99999887, 0.28173995, 0.3597019, 1)
 theme_override_font_sizes/font_size = 14
 text = "x"
 
-[node name="LocX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=194823508]
+[node name="LocX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer" unique_id=1486398668]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -204,7 +204,7 @@ theme_override_colors/font_color = Color(0.44842535, 0.7254196, 2.3102762e-06, 1
 theme_override_font_sizes/font_size = 14
 text = "y"
 
-[node name="LocY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=319463707]
+[node name="LocY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer2" unique_id=513853191]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -220,7 +220,7 @@ theme_override_colors/font_color = Color(5.583167e-06, 0.714586, 0.8246825, 1)
 theme_override_font_sizes/font_size = 14
 text = "z"
 
-[node name="LocZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer3" unique_id=1757294093]
+[node name="LocZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer/HBoxContainer/HBoxContainer3" unique_id=374298342]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -258,7 +258,7 @@ theme_override_colors/font_color = Color(0.99999887, 0.28173995, 0.3597019, 1)
 theme_override_font_sizes/font_size = 14
 text = "x"
 
-[node name="RotX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer" unique_id=912391432]
+[node name="RotX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer" unique_id=2120029181]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -274,7 +274,7 @@ theme_override_colors/font_color = Color(0.44842535, 0.7254196, 2.3102762e-06, 1
 theme_override_font_sizes/font_size = 14
 text = "y"
 
-[node name="RotY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer2" unique_id=1026710991]
+[node name="RotY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer2" unique_id=2130336006]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -290,7 +290,7 @@ theme_override_colors/font_color = Color(5.583167e-06, 0.714586, 0.8246825, 1)
 theme_override_font_sizes/font_size = 14
 text = "z"
 
-[node name="RotZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer3" unique_id=1606959348]
+[node name="RotZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer2/HBoxContainer/HBoxContainer3" unique_id=36698879]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -328,7 +328,7 @@ theme_override_colors/font_color = Color(0.99999887, 0.28173995, 0.3597019, 1)
 theme_override_font_sizes/font_size = 14
 text = "x"
 
-[node name="ScaX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer" unique_id=1171731612]
+[node name="ScaX" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer" unique_id=1819073398]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -344,7 +344,7 @@ theme_override_colors/font_color = Color(0.44842535, 0.7254196, 2.3102762e-06, 1
 theme_override_font_sizes/font_size = 14
 text = "y"
 
-[node name="ScaY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer2" unique_id=1002569506]
+[node name="ScaY" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer2" unique_id=2030916659]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
@@ -360,7 +360,7 @@ theme_override_colors/font_color = Color(5.583167e-06, 0.714586, 0.8246825, 1)
 theme_override_font_sizes/font_size = 14
 text = "z"
 
-[node name="ScaZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer3" unique_id=1754223839]
+[node name="ScaZ" type="LineEdit" parent="VBoxContainer/TransformPanel/VBoxContainer3/HBoxContainer/HBoxContainer3" unique_id=516737295]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
