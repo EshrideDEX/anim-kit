@@ -396,4 +396,4 @@ text = "TransP"
 [connection signal="item_selected" from="VBoxContainer/ScrollContainer/BoneList" to="." method="_on_bone_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
 [connection signal="gui_input" from="VBoxContainer/HBoxContainer/Paste" to="." method="_on_paste_button_gui_input"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]
+[connection signal="toggled" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]

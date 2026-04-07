@@ -177,7 +177,7 @@ func _on_paste_mirrored_pressed() -> void:
 
 	var undo_redo = EditorInterface.get_editor_undo_redo()
 	var old_transform: Transform3D = skeleton.get_bone_pose(target_idx)
-	var mirrored_global: Transform3D = _mirror_transform_x(copied_transform)
+	var mirrored_global: Transform3D = _mirror_transform(copied_transform)
 	
 	# Convert copied GLOBAL → LOCAL
 	var parent_idx: int = skeleton.get_bone_parent(target_idx)
@@ -208,26 +208,40 @@ func _on_paste_button_gui_input(event: InputEvent) -> void:
 			_on_paste_pressed()
 
 func _get_mirrored_bone_name(name: String) -> String:
-	if name.contains("L"):
-		return name.replace("L", "R")
-	elif name.contains("R"):
-		return name.replace("R", "L")
+	var replacements = [
+		[".L", ".R"],
+		["_L", "_R"],
+		["-L", "-R"],
+		[" L", " R"],
+		["Left", "Right"],
+		["left", "right"]
+	]
+
+	for pair in replacements:
+		if name.contains(pair[0]):
+			return name.replace(pair[0], pair[1])
+		if name.contains(pair[1]):
+			return name.replace(pair[1], pair[0])
+
 	return name
 
-func _mirror_transform_x(t: Transform3D) -> Transform3D:
-	# Mirror matrix (flip X axis)
+func _mirror_transform(t: Transform3D, axis: String = "x") -> Transform3D:
+	var flip := Vector3(1, 1, 1)
+
+	match axis:
+		"x": flip.x = -1
+		"y": flip.y = -1
+		"z": flip.z = -1
+
 	var mirror := Basis(
-		Vector3(-1, 0, 0),
-		Vector3(0, 1, 0),
-		Vector3(0, 0, 1)
+		Vector3(flip.x, 0, 0),
+		Vector3(0, flip.y, 0),
+		Vector3(0, 0, flip.z)
 	)
 
 	var mirrored := Transform3D()
 
-	# Mirror position
 	mirrored.origin = mirror * t.origin
-
-	# Mirror rotation properly
 	mirrored.basis = mirror * t.basis * mirror
 
 	return mirrored
@@ -321,16 +335,22 @@ func _commit_transform_with_undo(new_transform: Transform3D) -> void:
 func _on_line_edit_gui_input(event: InputEvent, type: String, axis: String, node: LineEdit) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
-			_increment_field(node, type, axis, 1.0)
+			var step = 0.1 if event.ctrl_pressed else 1.0
+			_increment_field(node, type, axis, step)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
-			_increment_field(node, type, axis, -1.0)
+			var step = 0.1 if event.ctrl_pressed else 1.0
+			_increment_field(node, type, axis, -step)
 
-func _increment_field(node: LineEdit, type: String, axis: String, delta: float):
+func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 	if not node.text.is_valid_float():
 		return
 	
 	var value = float(node.text)
-	value += delta
+	
+	if type == "rot":
+		value += step*10
+	else:
+		value += step/10
 	
 	if type == "sca":
 		value = max(value, 0.001)
