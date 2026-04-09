@@ -385,6 +385,10 @@ tooltip_text = "Paste the transform of a bone
 (Hold SHIFT to paste flipped)"
 icon = SubResource("DPITexture_itgml")
 
+[node name="MirrorAxis" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1321473708]
+layout_mode = 2
+text = " X "
+
 [node name="TransP" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=933207483]
 unique_name_in_owner = true
 layout_mode = 2
@@ -396,4 +400,5 @@ text = "TransP"
 [connection signal="item_selected" from="VBoxContainer/ScrollContainer/BoneList" to="." method="_on_bone_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
 [connection signal="gui_input" from="VBoxContainer/HBoxContainer/Paste" to="." method="_on_paste_button_gui_input"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/MirrorAxis" to="." method="_on_mirror_axis_btn_pressed"]
 [connection signal="toggled" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]

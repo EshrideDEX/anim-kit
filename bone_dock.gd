@@ -6,6 +6,7 @@ extends Control
 @onready var copy_btn: Button = %Copy
 @onready var paste_btn: Button = %Paste
 @onready var trans_p_btn: Button = %TransP
+@onready var mirror_axis_btn: Button = $VBoxContainer/HBoxContainer/MirrorAxis
 
 @onready var transform_fields = {
 	"location" : [%LocX, %LocY, %LocZ],
@@ -26,6 +27,11 @@ var bone_idx: int
 var current_location: Vector3
 var current_euler: Vector3
 var current_scale: Vector3
+
+var mirror_axis := "x"
+
+var ma_btn_style_nrm := StyleBoxFlat.new()
+var ma_btn_style_pressed := StyleBoxFlat.new()
 
 func _ready():
 	set_process(true)
@@ -177,7 +183,7 @@ func _on_paste_mirrored_pressed() -> void:
 
 	var undo_redo = EditorInterface.get_editor_undo_redo()
 	var old_transform: Transform3D = skeleton.get_bone_pose(target_idx)
-	var mirrored_global: Transform3D = _mirror_transform(copied_transform)
+	var mirrored_global: Transform3D = _mirror_transform(copied_transform, mirror_axis)
 	
 	# Convert copied GLOBAL → LOCAL
 	var parent_idx: int = skeleton.get_bone_parent(target_idx)
@@ -206,6 +212,8 @@ func _on_paste_button_gui_input(event: InputEvent) -> void:
 			_on_paste_mirrored_pressed()
 		else:
 			_on_paste_pressed()
+
+##------------------Bone Mirroring--------------------##
 
 func _get_mirrored_bone_name(name: String) -> String:
 	var replacements = [
@@ -245,6 +253,24 @@ func _mirror_transform(t: Transform3D, axis: String = "x") -> Transform3D:
 	mirrored.basis = mirror * t.basis * mirror
 
 	return mirrored
+
+func _on_mirror_axis_btn_pressed() -> void:
+	match mirror_axis:
+		"x":
+			mirror_axis = "y"
+			mirror_axis_btn.text = " Y "
+			ma_btn_style_nrm.set_bg_color(Color(0.447, 0.725, 0.0, 0.9))
+			ma_btn_style_pressed.set_bg_color(Color(0.571, 0.784, 0.37, 0.9))
+		"y":
+			mirror_axis = "z"
+			mirror_axis_btn.text = " Z "
+			ma_btn_style_nrm.set_bg_color(Color(0.0, 0.714, 0.824, 0.9))
+			ma_btn_style_pressed.set_bg_color(Color(0.543, 0.762, 0.822, 0.9))
+		"z":
+			mirror_axis = "x"
+			mirror_axis_btn.text = " X "
+			ma_btn_style_nrm.set_bg_color(Color(1.0, 0.282, 0.361, 0.9))
+			ma_btn_style_pressed.set_bg_color(Color(1.0, 0.441, 0.47, 0.9))
 
 ##------------------Handle Transforms--------------------##
 
@@ -369,3 +395,11 @@ func _setup_buttons():
 
 	copy_btn.text = ""
 	paste_btn.text = ""
+	
+	ma_btn_style_nrm.set_bg_color(Color(1.0, 0.282, 0.361, 0.9))
+	ma_btn_style_pressed.set_bg_color(Color(1.0, 0.441, 0.47, 0.9))
+	mirror_axis_btn.add_theme_stylebox_override("normal", ma_btn_style_nrm)
+	mirror_axis_btn.add_theme_stylebox_override("hover", ma_btn_style_nrm)
+	mirror_axis_btn.add_theme_stylebox_override("pressed", ma_btn_style_pressed)
+	ma_btn_style_nrm.set_corner_radius_all(5)
+	ma_btn_style_pressed.set_corner_radius_all(5)
