@@ -1,12 +1,12 @@
 @tool
 extends Control
 
-@onready var bone_list = $VBoxContainer/ScrollContainer/BoneList
-@onready var transform_panel: TabContainer = %TransformPanel
+@onready var bone_list = %BoneList
+@onready var transform_panel: VBoxContainer = %TransformPanel
 @onready var copy_btn: Button = %Copy
 @onready var paste_btn: Button = %Paste
 @onready var trans_p_btn: Button = %TransP
-@onready var mirror_axis_btn: Button = $VBoxContainer/HBoxContainer/MirrorAxis
+@onready var mirror_axis_btn: Button = %MirrorAxis
 
 @onready var transform_fields = {
 	"location" : [%LocX, %LocY, %LocZ],

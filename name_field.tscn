@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://bpxe3afd4kqv"]
+
+[node name="NameField" type="VBoxContainer" unique_id=1437258596]
+offset_right = 135.0
+offset_bottom = 66.0
+
+[node name="LineEdit" type="LineEdit" parent="." unique_id=1610210313]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=943262449]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="HBoxContainer" unique_id=1443899461]
+layout_mode = 2
+text = "Cancel"
+
+[node name="Confirm" type="Button" parent="HBoxContainer" unique_id=598114957]
+layout_mode = 2
+text = "Confirm"
