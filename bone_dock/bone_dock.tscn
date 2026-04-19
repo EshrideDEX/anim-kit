@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://dugo022snuej6"]
+[gd_scene format=3 uid="uid://dviktq70uuvsh"]
 
-[ext_resource type="Script" uid="uid://b684hrqpoi2tb" path="res://addons/anim_kit/bone_dock/bone_dock.gd" id="1_ty8x4"]
+[ext_resource type="Script" uid="uid://b684hrqpoi2tb" path="res://addons/anim_kit/bone_dock.gd" id="1_ty8x4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ty8x4"]
 content_margin_left = 10.0

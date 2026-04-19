@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://dtwj6lbcl2olh"]
+[gd_scene format=3 uid="uid://oskunssnbghm"]
 
-[ext_resource type="Script" uid="uid://djkn8463vgjb8" path="res://addons/anim_kit/pose_lib_dock/pose_lib_dock.gd" id="1_q8i6f"]
+[ext_resource type="Script" uid="uid://djkn8463vgjb8" path="res://addons/anim_kit/pose_lib_dock.gd" id="1_q8i6f"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bwuk8"]
 content_margin_left = 4.0

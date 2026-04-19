@@ -22,6 +22,12 @@ var editor_main_screen: Control
 var dragging := false
 var last_drag_x := 0
 
+var scroll_timer: float = 0.0
+var is_scrolling := false
+
+var scroll_start_transform: Transform3D
+var scroll_dirty := false
+
 var bone_idx: int
 
 var current_location: Vector3
@@ -46,17 +52,23 @@ func _ready():
 	for type in types:
 		for axis in axes:
 			var node_name = type.capitalize() + axis.capitalize()
-			var node = get_node("%" + node_name)
+			var node: LineEdit = get_node("%" + node_name)
 			
-			node.text_submitted.connect(_on_transform_changed.bind(type, axis))
-			node.focus_entered.connect(_on_focus_entered.bind(node, type, axis))
-			node.focus_exited.connect(_on_focus_lost.bind(node, type, axis))
+			node.text_changed.connect(_on_transform_changed.bind(type, axis))
+			node.text_submitted.connect(_on_transform_submitted.bind(type, axis))
+			node.focus_entered.connect(_on_focus_entered.bind(node))
+			node.focus_exited.connect(_on_focus_lost.bind(node))
 			node.gui_input.connect(_on_line_edit_gui_input.bind(type, axis, node))
 
-func _process(_delta):
+func _process(delta):
 	_update_skeleton()
 	_update_bone_list()
 	_check_bone_external_transform_change()
+	if is_scrolling:
+		scroll_timer -= delta
+		
+		if scroll_timer <= 0.0:
+			_commit_scroll_undo()
 
 ##------------------Handle Focus--------------------##
 
@@ -70,7 +82,7 @@ func _on_focus_entered(node: LineEdit) -> void:
 	
 	edit_start_transform = skeleton.get_bone_pose(idx)
 
-func _on_focus_lost(node: LineEdit, type: String, axis: String):
+func _on_focus_lost(node: LineEdit):
 	if not node.text.is_valid_float():
 		return
 	
@@ -105,7 +117,10 @@ func _update_bone_list():
 
 		for i in range(skeleton.get_bone_count()):
 			bone_list.add_item(skeleton.get_bone_name(i))
-	
+
+		if skeleton.get_bone_count() > 0:
+				bone_list.select(0)
+				_on_bone_selected(0)
 
 ##------------------Bone Selection--------------------##
 
@@ -305,7 +320,20 @@ func _on_transform_changed(new_text: String, type: String, axis: String) -> void
 		"rot": current_euler[axis] = val
 		"sca": current_scale[axis] = max(val, 0.001) # Safety clamp so scale won't reach 0
 	
-	_apply_transform()
+	_apply_transform(true)
+
+func _on_transform_submitted(new_text: String, type: String, axis: String) -> void:
+	if not new_text.is_valid_float():
+		return
+	
+	var val = float(new_text)
+	
+	match type:
+		"loc": current_location[axis] = val
+		"rot": current_euler[axis] = val
+		"sca": current_scale[axis] = max(val, 0.001)
+	
+	_apply_transform(false)
 
 func _check_bone_external_transform_change():
 	if bone_idx == -1 or skeleton == null:
@@ -371,18 +399,55 @@ func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 	if not node.text.is_valid_float():
 		return
 	
-	var value = float(node.text)
+	if not is_scrolling:
+		is_scrolling = true
+		scroll_start_transform = skeleton.get_bone_pose(bone_idx)
+	
+	scroll_dirty = true
 	
 	if type == "rot":
-		value += step*10
+		step *= 10
 	else:
-		value += step/10
+		step /= 10
+	
+	var value = float(node.text)
+	
+	value += step
 	
 	if type == "sca":
 		value = max(value, 0.001)
 	
 	node.text = str(snapped(value, 0.001))
 	_on_transform_changed(node.text, type, axis)
+	
+	# Reset scroll debounce timer
+	# This ensures that the Undo-Redo Manager only creates an action when
+	# scrolling has stopped.
+	scroll_timer = 0.25
+
+func _commit_scroll_undo() -> void:
+	if not scroll_dirty:
+		is_scrolling = false
+		return
+	
+	var undo_redo = EditorInterface.get_editor_undo_redo()
+	
+	var new_transform = skeleton.get_bone_pose(bone_idx)
+	var old_transform = scroll_start_transform
+	
+	undo_redo.create_action("Scroll Transform Bone")
+	
+	undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
+	undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
+	
+	undo_redo.add_do_method(self, "_update_current_transform")
+	undo_redo.add_undo_method(self, "_update_current_transform")
+	
+	undo_redo.commit_action()
+	
+	# reset
+	is_scrolling = false
+	scroll_dirty = false
 
 ##------------------Additional Setup--------------------##
 
