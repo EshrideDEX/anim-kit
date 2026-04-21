@@ -2,10 +2,11 @@
 
 Tired Godot's current armature workflow? Well, it just got an upgrade! This plugin aims to add many features that are just missing currently, especially for animating with bones using an AnimationPlayer.
 
-## Current features (v0.2)
+## Current features (v0.3)
 - Select bones from a list
 - Copy/paste bone transforms
 - Editing bone transforms with euler rotation editing
+- Working pose library dock for saving and loading poses
 
 ## Planned features
 - Hide bones
