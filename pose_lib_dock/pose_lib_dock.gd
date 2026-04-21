@@ -76,7 +76,9 @@ func _add_pose_button(file_name: String, pose_data: Dictionary) -> void:
 	pose_list.add_child(btn)
 
 func _on_pose_button_pressed(file_name: String) -> void:
-	var pose_data := _read_pose_file("user://AnimKit/poses/%s" % file_name)
+	var dir_path := "user://AnimKit/poses/%s" % _get_skeleton_id()
+	var pose_data := _read_pose_file("%s/%s" % [dir_path, file_name])
+	
 	if pose_data.is_empty():
 		return
 	
@@ -90,9 +92,8 @@ func _on_cancel_create_pose() -> void:
 
 ##------------------Read/Write Pose Files--------------------##
 func _write_pose_file(pose_name: String, pose_data: Dictionary) -> void:
-	_ensure_pose_dir()
-	
-	var file_path = "user://AnimKit/poses/%s.pose.json" % pose_name
+	var dir_path := _ensure_pose_dir()
+	var file_path := "%s/%s.pose.json" % [dir_path, pose_name]
 	
 	var file = FileAccess.open(file_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(pose_data, "\t"))
@@ -113,23 +114,34 @@ func _read_pose_file(file_path: String) -> Dictionary:
 	return parsed
 
 func _delete_pose_file(file_name: String) -> void:
-	var path := "user://AnimKit/poses/%s" % file_name
+	var path := "user://AnimKit/poses/%s/%s" % [_get_skeleton_id(), file_name]
+	
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(path)
 
-func _ensure_pose_dir() -> void:
+func _ensure_pose_dir() -> String:
+	var base := "user://AnimKit"
+	var poses := "%s/poses" % base
+	var skel_dir := "%s/%s" % [poses, _get_skeleton_id()]
+	
 	var dir = DirAccess.open("user://")
 	if not dir.dir_exists("AnimKit"):
 		dir.make_dir("AnimKit")
 	
-	dir = DirAccess.open("user://AnimKit")
+	dir = DirAccess.open(base)
 	if not dir.dir_exists("poses"):
 		dir.make_dir("poses")
+	
+	dir = DirAccess.open(poses)
+	if not dir.dir_exists(_get_skeleton_id()):
+		dir.make_dir(_get_skeleton_id())
+	
+	return skel_dir
 
 func _build_pose_dict(pose_name: String) -> Dictionary:
 	var pose := {
 		"pose_name" : pose_name,
-		"skeleton_id" : skeleton.get_instance_id(),
+		"skeleton_id" : _get_skeleton_id(),
 		"bones" : {}
 	}
 	
@@ -211,7 +223,7 @@ func _refresh_pose_buttons() -> void:
 		if child != new_pose_btn:
 			child.queue_free()
 	
-	var dir_path := "user://AnimKit/poses"
+	var dir_path := "user://AnimKit/poses/%s" % _get_skeleton_id()
 	var dir := DirAccess.open(dir_path)
 	if dir == null:
 		return
@@ -237,8 +249,24 @@ func _refresh_pose_buttons() -> void:
 	
 	if new_pose_btn.get_parent() != pose_list:
 		new_pose_btn.reparent(pose_list)
+	
 	pose_list.move_child(new_pose_btn, -1)
 
+##------------------Helpers------------------##
+
+func _get_skeleton_id() -> String:
+	if skeleton == null or !is_instance_valid(skeleton):
+		return ""
+	
+	if skeleton.has_meta("animkit_id"):
+		return skeleton.get_meta("animkit_id")
+	
+	var id := _generate_uuid()
+	skeleton.set_meta("animkit_id", id)
+	return id
+
+func _generate_uuid() -> String:
+	return "%s_%s" % [Time.get_unix_time_from_system(), randi()]
 
 ##------------------Additional Setup--------------------##
 
