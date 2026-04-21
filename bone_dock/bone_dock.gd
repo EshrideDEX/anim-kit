@@ -91,17 +91,10 @@ func _on_focus_lost(node: LineEdit):
 ##------------------Updates--------------------##
 
 func _update_skeleton():
-	var selection = EditorInterface.get_selection()
-	var nodes = selection.get_selected_nodes()
 	var skeleton_selected = false
 	
-	skeleton = null
-
-	for node in nodes:
-		if node is Skeleton3D:
-			skeleton = node
-			skeleton_selected = true
-			break
+	if skeleton:
+		skeleton_selected = true
 	
 	visible = skeleton_selected
 

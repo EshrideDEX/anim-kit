@@ -20,6 +20,24 @@ func _enter_tree():
 	pose_lib_dock.add_child(pos_lib_contents)
 	
 	add_dock(pose_lib_dock)
+	
+	EditorInterface.get_selection().selection_changed.connect(_update_skeleton)
+	
+func _update_skeleton():
+	var selection = EditorInterface.get_selection()
+	var nodes = selection.get_selected_nodes()
+	var found_skeleton: Skeleton3D = null
+
+	for node in nodes:
+		if node is Skeleton3D:
+			found_skeleton = node
+			break
+	
+	bone_dock.skeleton = found_skeleton
+	
+	var contents = pose_lib_dock.get_child(0)
+	if contents:
+		contents.skeleton = found_skeleton
 
 func _exit_tree():
 	editor_main_screen.remove_child(bone_dock)
