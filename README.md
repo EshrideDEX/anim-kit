@@ -4,7 +4,7 @@ Tired Godot's current armature workflow? Well, it just got an upgrade! This plug
 
 ![AnimKit Use Example](./example.png)
 
-## Current features (v0.3)
+## Current features (v1.0)
 - Bone dock for editing transforms with euler rotation editing
 - Copy/paste bone transforms
 - Working Pose Library for saving and loading poses
