@@ -16,6 +16,8 @@ var new_pose_popup: PopupPanel
 var new_pose_name_field: LineEdit
 var bone_list: ItemList
 
+signal pose_applied
+
 func _ready() -> void:
 	editor_main_screen = EditorInterface.get_editor_main_screen()
 	_setup_buttons()
@@ -73,6 +75,7 @@ func _add_pose_button(file_name: String, pose_data: Dictionary) -> void:
 	btn.custom_minimum_size = Vector2(75.0, 75.0)
 	btn.pressed.connect(_on_pose_button_pressed.bind(file_name))
 	btn.gui_input.connect(_on_pose_button_gui_input.bind(file_name))
+	btn.tooltip_text = "Middle click to delete this pose"
 	pose_list.add_child(btn)
 
 func _on_pose_button_pressed(file_name: String) -> void:
@@ -198,9 +201,12 @@ func _apply_pose(pose_data: Dictionary) -> void:
 		undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
 		undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
 	
-	undo_redo.add_do_method(self, "_update_current_transform")
-	undo_redo.add_undo_method(self, "_update_current_transform")
+	undo_redo.add_do_method(self, "_emit_pose_applied")
+	undo_redo.add_undo_method(self, "_emit_pose_applied")
 	undo_redo.commit_action()
+
+func _emit_pose_applied():
+	emit_signal("pose_applied")
 
 ##------------------Updates--------------------##
 
@@ -253,6 +259,21 @@ func _refresh_pose_buttons() -> void:
 	pose_list.move_child(new_pose_btn, -1)
 
 ##------------------Helpers------------------##
+
+func _set_skeleton(new_skeleton: Skeleton3D) -> void:
+	if skeleton == new_skeleton:
+		return
+	
+	skeleton = new_skeleton
+	
+	if skeleton == null:
+		pose_list.visible = false
+		return
+	
+	pose_list.visible = true
+	
+	_refresh_bone_list()
+	_refresh_pose_buttons()
 
 func _get_skeleton_id() -> String:
 	if skeleton == null or !is_instance_valid(skeleton):

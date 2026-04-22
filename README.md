@@ -17,5 +17,8 @@ Tired Godot's current armature workflow? Well, it just got an upgrade! This plug
 1. Copy the `anim_kit/` folder into your Godot project’s `addons/` folder
 2. Enable the plugin in Project → Project Settings → Plugins
 
+## Notes
+If you encounter any issues or have suggestions, please open a GitHub Issue.
+
 ## License
 [MIT License](LICENSE)

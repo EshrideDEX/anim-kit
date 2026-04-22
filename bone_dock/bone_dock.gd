@@ -221,25 +221,62 @@ func _on_paste_button_gui_input(event: InputEvent) -> void:
 		else:
 			_on_paste_pressed()
 
-##------------------Bone Mirroring--------------------##
+##------------------Bone/Pose Mirroring--------------------##
 
-func _get_mirrored_bone_name(name: String) -> String:
-	var replacements = [
-		[".L", ".R"],
-		["_L", "_R"],
-		["-L", "-R"],
-		[" L", " R"],
-		["Left", "Right"],
-		["left", "right"]
-	]
-
-	for pair in replacements:
-		if name.contains(pair[0]):
-			return name.replace(pair[0], pair[1])
-		if name.contains(pair[1]):
-			return name.replace(pair[1], pair[0])
-
-	return name
+func _mirror_full_pose() -> void:
+	if skeleton == null or not is_instance_valid(skeleton):
+		return
+	
+	var mirrored_globals := {} # target_idx -> mirrored global transform
+	var old_transforms := {}    # target_idx -> old local transform
+	
+	# Pass 1: compute all mirrored globals first
+	for i in range(skeleton.get_bone_count()):
+		var source_name := skeleton.get_bone_name(i)
+		var target_name := _get_mirrored_bone_name(source_name)
+		var target_idx := skeleton.find_bone(target_name)
+		
+		if target_idx == -1:
+			continue
+		
+		var source_global: Transform3D = skeleton.get_bone_global_pose(i)
+		mirrored_globals[target_idx] = _mirror_transform(source_global, mirror_axis)
+		old_transforms[target_idx] = skeleton.get_bone_pose(target_idx)
+	
+	# Pass 2: convert mirrored globals to local using mirrored parents when available
+	var edits := []
+	for target_idx in mirrored_globals.keys():
+		var mirrored_global: Transform3D = mirrored_globals[target_idx]
+		var parent_idx: int = skeleton.get_bone_parent(target_idx)
+		var new_local: Transform3D
+		
+		if parent_idx == -1:
+			new_local = mirrored_global
+		else:
+			var parent_global: Transform3D
+			if mirrored_globals.has(parent_idx):
+				parent_global = mirrored_globals[parent_idx]
+			else:
+				parent_global = skeleton.get_bone_global_pose(parent_idx)
+			
+			new_local = parent_global.affine_inverse() * mirrored_global
+		
+		edits.append({
+			"target_idx": target_idx,
+			"old_transform": old_transforms[target_idx],
+			"new_transform": new_local
+		})
+	
+	var undo_redo = EditorInterface.get_editor_undo_redo()
+	undo_redo.create_action("Mirror Full Pose")
+	
+	for edit in edits:
+		undo_redo.add_do_method(skeleton, "set_bone_pose", edit["target_idx"], edit["new_transform"])
+		undo_redo.add_undo_method(skeleton, "set_bone_pose", edit["target_idx"], edit["old_transform"])
+	
+	undo_redo.add_do_method(self, "_update_current_transform")
+	undo_redo.add_undo_method(self, "_update_current_transform")
+	undo_redo.commit_action()
 
 func _mirror_transform(t: Transform3D, axis: String = "x") -> Transform3D:
 	var flip := Vector3(1, 1, 1)
@@ -261,6 +298,24 @@ func _mirror_transform(t: Transform3D, axis: String = "x") -> Transform3D:
 	mirrored.basis = mirror * t.basis * mirror
 
 	return mirrored
+
+func _get_mirrored_bone_name(name: String) -> String:
+	var replacements = [
+		[".L", ".R"],
+		["_L", "_R"],
+		["-L", "-R"],
+		[" L", " R"],
+		["Left", "Right"],
+		["left", "right"]
+	]
+
+	for pair in replacements:
+		if name.contains(pair[0]):
+			return name.replace(pair[0], pair[1])
+		if name.contains(pair[1]):
+			return name.replace(pair[1], pair[0])
+
+	return name
 
 func _on_mirror_axis_btn_pressed() -> void:
 	match mirror_axis:
@@ -450,6 +505,8 @@ func _on_transform_panel_btn_toggled(pressed: bool) -> void:
 func _setup_buttons():
 	copy_btn.icon = editor_main_screen.get_theme_icon("ActionCopy", "EditorIcons")
 	paste_btn.icon = editor_main_screen.get_theme_icon("ActionPaste", "EditorIcons")
+	trans_p_btn.text = ""
+	trans_p_btn.icon = editor_main_screen.get_theme_icon("Panels2", "EditorIcons")
 
 	copy_btn.text = ""
 	paste_btn.text = ""

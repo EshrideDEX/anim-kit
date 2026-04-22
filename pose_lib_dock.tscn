@@ -72,23 +72,12 @@ text = "Pose Library"
 horizontal_alignment = 1
 
 [node name="Info" type="Label" parent="." unique_id=200888141]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "No poses created yet.
-Create a new one!"
 horizontal_alignment = 1
 
-[node name="NewPose" type="Button" parent="." unique_id=1128279411]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(75, 75)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-icon = SubResource("DPITexture_q8i6f")
-expand_icon = true
-
 [node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1829998938]
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -98,6 +87,15 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="NewPose" type="Button" parent="ScrollContainer/PoseList" unique_id=1128279411]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+icon = SubResource("DPITexture_q8i6f")
+expand_icon = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1950791949]
 visible = false
@@ -122,4 +120,4 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 icon = SubResource("DPITexture_k2al6")
 
-[connection signal="pressed" from="NewPose" to="." method="_on_new_pose_btn_pressed"]
+[connection signal="pressed" from="ScrollContainer/PoseList/NewPose" to="." method="_on_new_pose_btn_pressed"]

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dugo022snuej6"]
 
 [ext_resource type="Script" uid="uid://b684hrqpoi2tb" path="res://addons/anim_kit/bone_dock/bone_dock.gd" id="1_ty8x4"]
+[ext_resource type="Texture2D" uid="uid://vkwuhm1477n6" path="res://addons/anim_kit/icons/pose_mirror.svg" id="2_itgml"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ty8x4"]
 content_margin_left = 10.0
@@ -78,7 +79,7 @@ expand_margin_top = 2.0
 expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
-[sub_resource type="DPITexture" id="DPITexture_ty8x4"]
+[sub_resource type="DPITexture" id="DPITexture_itgml"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M2 1a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h1V3h9V2a1 1 0 0 0-1-1zm3 3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zm1 2h7v7H6z\"/></svg>
 "
 saturation = 2.0
@@ -88,7 +89,7 @@ Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
 Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
 }
 
-[sub_resource type="DPITexture" id="DPITexture_itgml"]
+[sub_resource type="DPITexture" id="DPITexture_lkpb2"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M2 3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-3.184a3 3 0 0 0-5.632 0zm6 0a1 1 0 0 1 0 2 1 1 0 0 1 0-2zM3 5h2v2h6V5h2v8H3z\"/></svg>
 "
 saturation = 2.0
@@ -111,6 +112,63 @@ corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bwuk8"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y0208"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_156h1"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3mnc0"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.3)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="DPITexture" id="DPITexture_bwuk8"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 4h12v4H2zm12 6v4H2v-4z\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
 
 [node name="BoneDock" type="Control" unique_id=912353562]
 visible = false
@@ -404,14 +462,14 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Copy the transform of a bone"
-icon = SubResource("DPITexture_ty8x4")
+icon = SubResource("DPITexture_itgml")
 
 [node name="Paste" type="Button" parent="VBoxContainer/TransformPanel/HBoxContainer" unique_id=2134506023]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Paste the transform of a bone
 (Hold SHIFT to paste flipped)"
-icon = SubResource("DPITexture_itgml")
+icon = SubResource("DPITexture_lkpb2")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=673465804]
 layout_mode = 2
@@ -422,10 +480,25 @@ alignment = 1
 [node name="MirrorAxis" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1321473708]
 unique_name_in_owner = true
 layout_mode = 2
+tooltip_text = "Toggle between X, Y and Z axis for mirroring and copy/paste"
 theme_override_styles/normal = SubResource("StyleBoxFlat_7qsxy")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_7suxi")
 theme_override_styles/hover = SubResource("StyleBoxFlat_7qsxy")
 text = " X "
+
+[node name="PoseMirror" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2055353057]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+tooltip_text = "Mirror current pose across mirroring axis"
+theme_override_styles/normal = SubResource("StyleBoxFlat_bwuk8")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_y0208")
+theme_override_styles/hover = SubResource("StyleBoxFlat_156h1")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_3mnc0")
+icon = ExtResource("2_itgml")
+expand_icon = true
 
 [node name="TransP" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=933207483]
 unique_name_in_owner = true
@@ -433,10 +506,11 @@ layout_mode = 2
 tooltip_text = "Toggle the Transform Panel"
 theme_override_font_sizes/font_size = 12
 toggle_mode = true
-text = "TransP"
+icon = SubResource("DPITexture_bwuk8")
 
 [connection signal="item_selected" from="VBoxContainer/ScrollContainer/BoneList" to="." method="_on_bone_selected"]
 [connection signal="pressed" from="VBoxContainer/TransformPanel/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
 [connection signal="gui_input" from="VBoxContainer/TransformPanel/HBoxContainer/Paste" to="." method="_on_paste_button_gui_input"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MirrorAxis" to="." method="_on_mirror_axis_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/PoseMirror" to="." method="_mirror_full_pose"]
 [connection signal="toggled" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]
