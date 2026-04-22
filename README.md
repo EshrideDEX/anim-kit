@@ -3,15 +3,15 @@
 Tired Godot's current armature workflow? Well, it just got an upgrade! This plugin aims to add many features that are just missing currently, especially for animating with bones using an AnimationPlayer.
 
 ## Current features (v0.3)
-- Select bones from a list
+- Bone dock for editing transforms with euler rotation editing
 - Copy/paste bone transforms
-- Editing bone transforms with euler rotation editing
-- Working pose library dock for saving and loading poses
+- Working Pose Library for saving and loading poses
+- Mirroring full poses
 
 ## Planned features
-- Hide bones
-- Quick bone selection via viewport
-- Full cutscene animation tools
+- Hide/Isolate bones
+- Mirroring full animations
+- More cutscene animation tools
 
 ## Installation
 1. Copy the `anim_kit/` folder into your Godot project’s `addons/` folder
