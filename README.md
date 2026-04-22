@@ -7,9 +7,9 @@ Tired Godot's current armature workflow? Well, it just got an upgrade! This plug
 ## Current features (v1.0)
 | Euler Rotation Editing | Copy/Paste Transforms |
 | :--- | :--- |
-| <video src="https://github.com/user-attachments/assets/ee39f4e2-ec61-4e31-8bdb-24b813a1790e" width="400" autoplay loop muted playsinline></video> | <video src="https://github.com/user-attachments/assets/6c0e9aae-179e-4d84-8673-7f681974a3ad" width="400" autoplay loop muted playsinline></video> |
+| <video src="https://github.com/user-attachments/assets/ee39f4e2-ec61-4e31-8bdb-24b813a1790e" width="400" autoplay loop muted playsinline type="video/mp4"></video> | <video src="https://github.com/user-attachments/assets/6c0e9aae-179e-4d84-8673-7f681974a3ad" width="400" autoplay loop muted playsinline type="video/mp4"></video> |
 | **Pose Library** | **Full Pose Mirroring** |
-| <video src="https://github.com/user-attachments/assets/e14ed8c4-049c-47fa-854d-015427f513f2" width="400" autoplay loop muted playsinline></video> | <video src="https://github.com/user-attachments/assets/16c3b359-8aa0-4259-8f6f-b4ef41f7caa7" width="400" autoplay loop muted playsinline></video> |
+| <video src="https://github.com/user-attachments/assets/e14ed8c4-049c-47fa-854d-015427f513f2" width="400" autoplay loop muted playsinline type="video/mp4"></video> | <video src="https://github.com/user-attachments/assets/16c3b359-8aa0-4259-8f6f-b4ef41f7caa7" width="400" autoplay loop muted playsinline type="video/mp4"></video> |
 
 
 - Bone dock for editing transforms with euler rotation editing
