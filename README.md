@@ -4,7 +4,7 @@ Tired Godot's current armature workflow? Well, it just got an upgrade! This plug
 
 ![AnimKit Use Example](./example.png)
 
-## Current features (v1.0 beta)
+## Current features (v1.0 Beta)
 | Euler Rotation Editing | Copy/Paste Transforms |
 | :--- | :--- |
 | <img width="390" alt="Euler" src="https://github.com/user-attachments/assets/895bdf92-59a3-4ff6-a7cc-c6c935bcc92e" /> | <img width="390" alt="CopyPaste" src="https://github.com/user-attachments/assets/74bbd6b0-0586-47b4-aa53-476fa317a2c9" /> |
