@@ -7,9 +7,9 @@ Tired Godot's current armature workflow? Well, it just got an upgrade! This plug
 ## Current features (v1.0)
 | Euler Rotation Editing | Copy/Paste Transforms |
 | :--- | :--- |
-| <video src="https://github.com/user-attachments/assets/ee39f4e2-ec61-4e31-8bdb-24b813a1790e" width="400" autoplay loop muted playsinline type="video/mp4"></video> | <video src="https://github.com/user-attachments/assets/6c0e9aae-179e-4d84-8673-7f681974a3ad" width="400" autoplay loop muted playsinline type="video/mp4"></video> |
+| <img width="465" alt="Euler" src="https://github.com/user-attachments/assets/895bdf92-59a3-4ff6-a7cc-c6c935bcc92e" /> | <img width="465" alt="CopyPaste" src="https://github.com/user-attachments/assets/38a7f184-00d4-45f9-9de3-2c300b7e0a81" /> |
 | **Pose Library** | **Full Pose Mirroring** |
-| <video src="https://github.com/user-attachments/assets/e14ed8c4-049c-47fa-854d-015427f513f2" width="400" autoplay loop muted playsinline type="video/mp4"></video> | <video src="https://github.com/user-attachments/assets/16c3b359-8aa0-4259-8f6f-b4ef41f7caa7" width="400" autoplay loop muted playsinline type="video/mp4"></video> |
+| <img width="465" alt="PoseLib" src="https://github.com/user-attachments/assets/74bbd6b0-0586-47b4-aa53-476fa317a2c9" /> | <img width="465" alt="Mirror" src="https://github.com/user-attachments/assets/1fd63485-3eb1-423d-918e-53ed7babbfaf" /> |
 
 
 - Bone dock for editing transforms with euler rotation editing
