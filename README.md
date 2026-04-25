@@ -2,14 +2,14 @@
 
 Tired Godot's current armature workflow? Well, it just got an upgrade! This plugin aims to add many features that are just missing currently, especially for animating with bones using an AnimationPlayer.
 
-![AnimKit Use Example](./example.png)
+![AnimKit Use Example](./example/example.png)
 
 ## Current features (v1.0 Beta)
 | Euler Rotation Editing | Copy/Paste Transforms |
 | :--- | :--- |
-| <img width="390" alt="Euler" src="https://github.com/user-attachments/assets/895bdf92-59a3-4ff6-a7cc-c6c935bcc92e" /> | <img width="390" alt="CopyPaste" src="https://github.com/user-attachments/assets/74bbd6b0-0586-47b4-aa53-476fa317a2c9" /> |
+| <img width="390" alt="Euler" src="./example/example_movie_1.gif" /> | <img width="390" alt="CopyPaste" src="./example/example_movie_2.gif" /> |
 | **Pose Library** | **Full Pose Mirroring** |
-| <img width="390" alt="PoseLib" src="https://github.com/user-attachments/assets/1fd63485-3eb1-423d-918e-53ed7babbfaf" /> | <img width="390" alt="Mirror" src="https://github.com/user-attachments/assets/38a7f184-00d4-45f9-9de3-2c300b7e0a81" /> |
+| <img width="390" alt="PoseLib" src="./example/example_movie_3.gif" /> | <img width="390" alt="Mirror" src="./example/example_movie_4.gif" /> |
 
 - Bone dock for editing transforms with euler rotation editing
 - Copy/paste bone transforms
