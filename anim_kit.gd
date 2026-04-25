@@ -7,7 +7,7 @@ var pose_lib_contents
 var editor_main_screen: Control
 
 func _enter_tree():
-	bone_dock = preload("res://addons/anim_kit/bone_dock.tscn").instantiate()
+	bone_dock = preload("res://addons/anim_kit/bone_dock/bone_dock.tscn").instantiate()
 	bone_dock.name = "AnimKit"
 	editor_main_screen = EditorInterface.get_editor_main_screen()
 	editor_main_screen.add_child(bone_dock)
@@ -17,7 +17,7 @@ func _enter_tree():
 	pose_lib_dock.title = "Pose Library"
 	pose_lib_dock.default_slot = EditorDock.DOCK_SLOT_BOTTOM
 	
-	pose_lib_contents = preload("res://addons/anim_kit/pose_lib_dock.tscn").instantiate()
+	pose_lib_contents = preload("res://addons/anim_kit/pose_lib_dock/pose_lib_dock.tscn").instantiate()
 	pose_lib_dock.add_child(pose_lib_contents)
 	
 	add_dock(pose_lib_dock)

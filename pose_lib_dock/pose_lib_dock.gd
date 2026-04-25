@@ -302,6 +302,9 @@ func _setup_buttons() -> void:
 	delete_btn.text = ""
 	delete_btn.icon = editor_main_screen.get_theme_icon("Remove", "EditorIcons")
 
+func _on_confirm_create_pressed() -> void:
+	_on_confirm_create_pose(new_pose_name_field.text)
+
 func _setup_popups() -> void:
 	new_pose_popup = PopupPanel.new()
 	
@@ -328,7 +331,7 @@ func _setup_popups() -> void:
 	var hbox = HBoxContainer.new()
 	var confirm_btn = Button.new()
 	confirm_btn.text = "Create"
-	confirm_btn.pressed.connect(_on_confirm_create_pose.bind(new_pose_name_field.text))
+	confirm_btn.pressed.connect(_on_confirm_create_pressed)
 	hbox.add_child(confirm_btn)
 	var clear_btn = Button.new()
 	clear_btn.text = "Clear"

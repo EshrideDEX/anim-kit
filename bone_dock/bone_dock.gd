@@ -1,12 +1,13 @@
 @tool
 extends Control
 
-@onready var bone_list = %BoneList
+@onready var bone_list: ItemList = %BoneList
 @onready var transform_panel: VBoxContainer = %TransformPanel
 @onready var copy_btn: Button = %Copy
 @onready var paste_btn: Button = %Paste
 @onready var trans_p_btn: Button = %TransP
 @onready var mirror_axis_btn: Button = %MirrorAxis
+@onready var selection_label: Label = %SelectionLabel
 
 @onready var transform_fields = {
 	"location" : [%LocX, %LocY, %LocZ],
@@ -15,20 +16,19 @@ extends Control
 }
 
 var skeleton: Skeleton3D
-var copied_transform: Transform3D
+var copied_transforms: Array = []
 var edit_start_transform: Transform3D
 var editor_main_screen: Control
 
 var dragging := false
 var last_drag_x := 0
 
+var scroll_start_transforms: Dictionary = {}
 var scroll_timer: float = 0.0
+var scroll_dirty := false
 var is_scrolling := false
 
-var scroll_start_transform: Transform3D
-var scroll_dirty := false
-
-var bone_idx: int
+var bone_idxs: Array
 
 var current_location: Vector3
 var current_euler: Vector3
@@ -45,6 +45,9 @@ func _ready():
 	
 	transform_panel.hide()
 	call_deferred("_setup_buttons")
+	
+	bone_list.item_selected.connect(_on_bone_selection_changed)
+	bone_list.multi_selected.connect(_on_bone_selection_changed)
 	
 	var types = ["loc", "rot", "sca"]
 	var axes = ["x", "y", "z"]
@@ -76,11 +79,11 @@ func _on_focus_entered(node: LineEdit) -> void:
 	if skeleton == null:
 		return
 		
-	var idx = _get_selected_bone_index()
-	if idx == -1:
+	var idxs = _get_selected_bone_indexes()
+	if idxs.is_empty():
 		return
-	
-	edit_start_transform = skeleton.get_bone_pose(idx)
+
+	edit_start_transform = skeleton.get_bone_pose(idxs[0])
 
 func _on_focus_lost(node: LineEdit):
 	if not node.text.is_valid_float():
@@ -102,7 +105,7 @@ func _update_skeleton():
 func _update_bone_list():
 	if skeleton == null:
 		bone_list.clear()
-		bone_idx = -1
+		bone_idxs = []
 		return
 
 	if bone_list.item_count != skeleton.get_bone_count():
@@ -113,19 +116,30 @@ func _update_bone_list():
 
 		if skeleton.get_bone_count() > 0:
 				bone_list.select(0)
-				_on_bone_selected(0)
+				_on_bone_selection_changed(0)
+
+func _update_selection_info():
+	var selected = _get_selected_bone_indexes()
+	if selection_label:
+		if selected.is_empty():
+			selection_label.text = "No bones selected"
+		elif selected.size() == 1:
+			selection_label.text = "1 bone selected"
+		else:
+			selection_label.text = str(selected.size()) + " bones selected"
 
 ##------------------Bone Selection--------------------##
 
-func _get_selected_bone_index():
+func _get_selected_bone_indexes() -> Array:
 	var selected = bone_list.get_selected_items()
 	if selected.size() == 0:
-		return -1
-	return selected[0]
+		return []
+	return selected
 
-func _on_bone_selected(index: int) -> void:
-	bone_idx = index
+func _on_bone_selection_changed(index: int = -1, selected: bool = false) -> void:
+	bone_idxs = _get_selected_bone_indexes()
 	_update_current_transform()
+	_update_selection_info()
 
 ##------------------Copy/Paste--------------------##
 
@@ -133,85 +147,80 @@ func _on_copy_pressed() -> void:
 	if skeleton == null:
 		return
 
-	var bone_idx = _get_selected_bone_index()
-	if bone_idx == -1:
+	var bn_idxs = _get_selected_bone_indexes()
+	if bn_idxs.is_empty():
 		return
-
-	copied_transform = skeleton.get_bone_global_pose(bone_idx)
+	
+	copied_transforms.clear()
+	
+	for idx in bn_idxs:
+		var bone_name = skeleton.get_bone_name(idx)
+		var bone_trans: Transform3D = skeleton.get_bone_pose(idx) # local, not global
+		
+		copied_transforms.append({
+			"bone_name": bone_name,
+			"bone_trans": bone_trans
+		})
 
 func _on_paste_pressed() -> void:
 	if skeleton == null:
 		return
 
-	var bone_idx = _get_selected_bone_index()
-	if bone_idx == -1:
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty() or copied_transforms.is_empty():
 		return
-
-	var undo_redo = EditorInterface.get_editor_undo_redo()
-
-	var old_transform: Transform3D = skeleton.get_bone_pose(bone_idx)
-
-	# Convert copied GLOBAL → LOCAL
-	var parent_idx: int = skeleton.get_bone_parent(bone_idx)
-	var new_transform: Transform3D
-
-	if parent_idx == -1:
-		# Root bone
-		new_transform = copied_transform
-	else:
-		var parent_global: Transform3D = skeleton.get_bone_global_pose(parent_idx)
-		new_transform = parent_global.affine_inverse() * copied_transform
 	
-	# Paste undo/redo
-	undo_redo.create_action("Paste Bone Transform (World)")
+	if selected.size() != copied_transforms.size():
+		push_warning("Paste failed: Selected %d bones but copied %d bones. Select exactly %d bones to paste." %
+			[selected.size(), copied_transforms.size(), copied_transforms.size()])
+		return
+	
+	var undo_redo = EditorInterface.get_editor_undo_redo()
+	undo_redo.create_action("Paste Bone Transforms")
 
-	undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
-	undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
+	for i in range(selected.size()):
+		var target_idx: int = selected[i]
+		var copied_data: Dictionary = copied_transforms[i]
+		var new_local: Transform3D = copied_data["bone_trans"]
+		var old_local: Transform3D = skeleton.get_bone_pose(target_idx)
+
+		undo_redo.add_do_method(skeleton, "set_bone_pose", target_idx, new_local)
+		undo_redo.add_undo_method(skeleton, "set_bone_pose", target_idx, old_local)
 
 	undo_redo.add_do_method(self, "_update_current_transform")
 	undo_redo.add_undo_method(self, "_update_current_transform")
-
 	undo_redo.commit_action()
 
 func _on_paste_mirrored_pressed() -> void:
 	if skeleton == null:
 		return
 
-	var bone_idx = _get_selected_bone_index()
-	if bone_idx == -1:
-		return
-
-	var bone_name = skeleton.get_bone_name(bone_idx)
-	var target_name = _get_mirrored_bone_name(bone_name)
-
-	var target_idx = skeleton.find_bone(target_name)
-	if target_idx == -1:
-		print("No mirrored bone found for: ", bone_name)
+	if copied_transforms.is_empty() or copied_transforms.size() != bone_list.get_selected_items().size():
+		push_warning("Paste requires the same number of copied and selected bones.")
 		return
 
 	var undo_redo = EditorInterface.get_editor_undo_redo()
-	var old_transform: Transform3D = skeleton.get_bone_pose(target_idx)
-	var mirrored_global: Transform3D = _mirror_transform(copied_transform, mirror_axis)
-	
-	# Convert copied GLOBAL → LOCAL
-	var parent_idx: int = skeleton.get_bone_parent(target_idx)
-	var new_transform: Transform3D
+	undo_redo.create_action("Paste Mirrored Bone Transforms")
 
-	if parent_idx == -1:
-		new_transform = mirrored_global
-	else:
-		var parent_global: Transform3D = skeleton.get_bone_global_pose(parent_idx)
-		new_transform = parent_global.affine_inverse() * mirrored_global
+	for copied_data in copied_transforms:
+		var source_name: String = copied_data["bone_name"]
+		var copied_local: Transform3D = copied_data["bone_trans"]
 
-	# Paste mirrored undo/redo
-	undo_redo.create_action("Paste Mirrored Bone Transform")
+		var target_name: String = _get_mirrored_bone_name(source_name)
+		var target_idx: int = skeleton.find_bone(target_name)
 
-	undo_redo.add_do_method(skeleton, "set_bone_pose", target_idx, new_transform)
-	undo_redo.add_undo_method(skeleton, "set_bone_pose", target_idx, old_transform)
+		if target_idx == -1:
+			print("No mirrored bone found for: ", source_name)
+			continue
+		
+		var old_local: Transform3D = skeleton.get_bone_pose(target_idx)
+		var mirrored_local: Transform3D = _mirror_transform(copied_local, mirror_axis)
+
+		undo_redo.add_do_method(skeleton, "set_bone_pose", target_idx, mirrored_local)
+		undo_redo.add_undo_method(skeleton, "set_bone_pose", target_idx, old_local)
 
 	undo_redo.add_do_method(self, "_update_current_transform")
 	undo_redo.add_undo_method(self, "_update_current_transform")
-
 	undo_redo.commit_action()
 
 func _on_paste_button_gui_input(event: InputEvent) -> void:
@@ -338,9 +347,21 @@ func _on_mirror_axis_btn_pressed() -> void:
 ##------------------Handle Transforms--------------------##
 
 func _update_current_transform():
-	if bone_idx == -1 or skeleton == null:
+	if skeleton == null:
 		return
-	var transform = skeleton.get_bone_pose(bone_idx)
+	
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
+		# Clear transform fields
+		for key in transform_fields:
+			for node in transform_fields[key]:
+				node.text = ""
+		return
+	
+	# Use the first selected bone as the reference for UI display
+	var bone_idx: int = selected[0]
+	var transform: Transform3D = skeleton.get_bone_pose(bone_idx)
+	
 	current_location = transform.origin
 	current_scale = transform.basis.get_scale()
 	current_euler = transform.basis.get_euler() * (180.0 / PI)
@@ -352,88 +373,173 @@ func _update_current_transform():
 	}
 
 	for key in transform_fields:
-		var vector_value = data_map[key]
-		var nodes = transform_fields[key]
+		var vector_value: Vector3 = data_map[key]
+		var nodes: Array = transform_fields[key]
 		
 		nodes[0].text = str(snapped(vector_value.x, 0.001))
 		nodes[1].text = str(snapped(vector_value.y, 0.001))
 		nodes[2].text = str(snapped(vector_value.z, 0.001))
+	
+	if selected.size() > 1:
+		# Show mixed values since multiple bones are selected
+		for key in transform_fields:
+				for node in transform_fields[key]:
+					node.text = "---"
 
 func _on_transform_changed(new_text: String, type: String, axis: String) -> void:
-	if not new_text.is_valid_float(): return
-	var val = float(new_text)
+	var val := float(new_text)
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
+		return
 	
-	match type:
-		"loc": current_location[axis] = val
-		"rot": current_euler[axis] = val
-		"sca": current_scale[axis] = max(val, 0.001) # Safety clamp so scale won't reach 0
-	
-	_apply_transform(true)
+	if selected.size() == 1:
+		var axis_idx := _axis_to_index(axis)
+		
+		match type:
+			"loc":
+				current_location[axis_idx] = val
+			"rot":
+				current_euler[axis_idx] = val
+			"sca":
+				current_scale[axis_idx] = max(val, 0.001)
+		
+		_apply_transform(true)
 
 func _on_transform_submitted(new_text: String, type: String, axis: String) -> void:
-	if not new_text.is_valid_float():
+	var val := float(new_text)
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
 		return
 	
-	var val = float(new_text)
+	var axis_idx := _axis_to_index(axis)
+	var undo_redo = EditorInterface.get_editor_undo_redo()
+	undo_redo.create_action("Set " + type.capitalize() + " " + axis.to_upper())
 	
-	match type:
-		"loc": current_location[axis] = val
-		"rot": current_euler[axis] = val
-		"sca": current_scale[axis] = max(val, 0.001)
-	
-	_apply_transform(false)
+	for bone_idx in selected:
+		var current_transform: Transform3D = skeleton.get_bone_pose(bone_idx)
+		var location := current_transform.origin
+		var scale := current_transform.basis.get_scale()
+		var euler := current_transform.basis.get_euler() * (180.0 / PI)
+		
+		match type:
+			"loc":
+				location[axis_idx] = val
+			"rot":
+				euler[axis_idx] = val
+			"sca":
+				scale[axis_idx] = max(val, 0.001)
+		
+		var rad_euler := euler * (PI / 180.0)
+		var new_basis := Basis.from_euler(rad_euler)
+		new_basis = new_basis.scaled(scale)
+		var new_transform := Transform3D(new_basis, location)
+		
+		undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
+		undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, current_transform)
 
 func _check_bone_external_transform_change():
-	if bone_idx == -1 or skeleton == null:
+	if skeleton == null:
 		return
 	
-	var transform = skeleton.get_bone_pose(bone_idx)
-	var bone_loc = transform.origin
-	var bone_scale = transform.basis.get_scale()
-	var bone_euler = transform.basis.get_euler() * 180.0 / PI
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
+		return
 	
-	# Only update transforms when user is not actively editing fields
+	# If any field has focus, skip auto-update
 	for key in transform_fields:
-		var nodes = transform_fields[key]
-		for node in nodes:
+		for node in transform_fields[key]:
 			if node.has_focus():
 				return
-	# Check if anything changed
-	if bone_loc != current_location or bone_scale != current_scale or bone_euler != current_euler:
-		current_location = bone_loc
-		current_scale = bone_scale
-		current_euler = bone_euler
+	
+	# Check if ANY selected bone changed
+	var needs_update = false
+	
+	for bone_idx in selected:
+		var transform: Transform3D = skeleton.get_bone_pose(bone_idx)
+		var bone_loc := transform.origin
+		var bone_scale := transform.basis.get_scale()
+		var bone_euler := transform.basis.get_euler() * 180.0 / PI
+		
+		# Compare with current display values
+		if bone_loc != current_location or bone_scale != current_scale or bone_euler != current_euler:
+			needs_update = true
+			break
+	
+	if needs_update:
 		_update_current_transform()
 
 func _apply_transform(live := true) -> void:
-	if bone_idx == -1:
+	if skeleton == null:
 		return
 	
-	var rad_euler = current_euler * (PI / 180.0)
-	var new_basis = Basis.from_euler(rad_euler)
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
+		return
+	
+	var rad_euler := current_euler * (PI / 180.0)
+	var new_basis := Basis.from_euler(rad_euler)
 	new_basis = new_basis.scaled(current_scale)
-	var new_transform = Transform3D(new_basis, current_location)
+	var new_transform := Transform3D(new_basis, current_location)
 
 	if live:
 		# Real-time preview (NO undo)
-		skeleton.set_bone_pose(bone_idx, new_transform)
+		for bone_idx in selected:
+			skeleton.set_bone_pose(bone_idx, new_transform)
 	else:
 		# Final commit (WITH undo)
 		_commit_transform_with_undo(new_transform)
 
+func _apply_relative_transform_to_bone(bone_idx: int, type: String, axis: String, delta: float) -> void:
+	var transform: Transform3D = skeleton.get_bone_pose(bone_idx)
+	
+	var location := transform.origin
+	var scale := transform.basis.get_scale()
+	var euler := transform.basis.get_euler() * (180.0 / PI)
+	var axis_idx := _axis_to_index(axis)
+	
+	match type:
+		"loc":
+			location[axis_idx] += delta
+		"rot":
+			euler[axis_idx] += delta
+		"sca":
+			scale[axis_idx] = max(scale[axis_idx] + delta, 0.001)
+	
+	var basis := Basis.from_euler(euler * (PI / 180.0))
+	basis = basis.scaled(scale)
+	skeleton.set_bone_pose(bone_idx, Transform3D(basis, location))
+
+func _axis_to_index(axis: String) -> int:
+	match axis:
+		"x":
+			return 0
+		"y":
+			return 1
+		"z":
+			return 2
+		_:
+			return 0
+
 func _commit_transform_with_undo(new_transform: Transform3D) -> void:
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
+		return
+	
 	var undo_redo = EditorInterface.get_editor_undo_redo()
+	undo_redo.create_action("Transform Bones")
 
-	var old_transform = edit_start_transform
+	for bone_idx in selected:
+		var old_transform: Transform3D = skeleton.get_bone_pose(bone_idx)
 
-	undo_redo.create_action("Transform Bone")
+		undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
+		undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
 
-	undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
-	undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
-
+	undo_redo.add_do_method(self, "_update_current_transform")
+	undo_redo.add_undo_method(self, "_update_current_transform")
 	undo_redo.commit_action()
 
 ##------------------Gestures--------------------##
+
 func _on_line_edit_gui_input(event: InputEvent, type: String, axis: String, node: LineEdit) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
@@ -444,12 +550,16 @@ func _on_line_edit_gui_input(event: InputEvent, type: String, axis: String, node
 			_increment_field(node, type, axis, -step)
 
 func _increment_field(node: LineEdit, type: String, axis: String, step: float):
-	if not node.text.is_valid_float():
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
 		return
 	
 	if not is_scrolling:
 		is_scrolling = true
-		scroll_start_transform = skeleton.get_bone_pose(bone_idx)
+		# Store starting transform from the first selected bone
+		scroll_start_transforms.clear()
+		for bone_idx in selected:
+			scroll_start_transforms[bone_idx] = skeleton.get_bone_pose(bone_idx)
 	
 	scroll_dirty = true
 	
@@ -458,15 +568,11 @@ func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 	else:
 		step /= 10
 	
-	var value = float(node.text)
+	# Apply relative transform to ALL selected bones
+	for bone_idx in selected:
+		_apply_relative_transform_to_bone(bone_idx, type, axis, step)
 	
-	value += step
-	
-	if type == "sca":
-		value = max(value, 0.001)
-	
-	node.text = str(snapped(value, 0.001))
-	_on_transform_changed(node.text, type, axis)
+	_update_current_transform()
 	
 	# Reset scroll debounce timer
 	# This ensures that the Undo-Redo Manager only creates an action when
@@ -476,26 +582,35 @@ func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 func _commit_scroll_undo() -> void:
 	if not scroll_dirty:
 		is_scrolling = false
+		scroll_start_transforms.clear()
+		return
+	
+	var selected := _get_selected_bone_indexes()
+	if selected.is_empty():
+		is_scrolling = false
+		scroll_dirty = false
+		scroll_start_transforms.clear()
 		return
 	
 	var undo_redo = EditorInterface.get_editor_undo_redo()
+	undo_redo.create_action("Scroll Transform Bones")
 	
-	var new_transform = skeleton.get_bone_pose(bone_idx)
-	var old_transform = scroll_start_transform
-	
-	undo_redo.create_action("Scroll Transform Bone")
-	
-	undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
-	undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
+	for bone_idx in selected:
+		var new_transform: Transform3D = skeleton.get_bone_pose(bone_idx)
+		var old_transform: Transform3D = scroll_start_transforms.get(bone_idx)
+		
+		if old_transform != null:
+			undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
+			undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, old_transform)
 	
 	undo_redo.add_do_method(self, "_update_current_transform")
 	undo_redo.add_undo_method(self, "_update_current_transform")
-	
 	undo_redo.commit_action()
 	
-	# reset
+	# Reset
 	is_scrolling = false
 	scroll_dirty = false
+	scroll_start_transforms.clear()
 
 ##------------------Additional Setup--------------------##
 
