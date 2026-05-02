@@ -24,7 +24,10 @@ var dragging := false
 var last_drag_x := 0
 
 var scroll_start_transforms: Dictionary = {}
+var scroll_start_bases: Dictionary = {}
 var scroll_timer: float = 0.0
+var scroll_accumulated_delta := 0.0
+var scroll_current_value := 0.0
 var scroll_dirty := false
 var is_scrolling := false
 
@@ -35,6 +38,7 @@ var current_euler: Vector3
 var current_scale: Vector3
 
 var mirror_axis := "x"
+var suppress_field_signals := false
 
 var ma_btn_style_nrm := StyleBoxFlat.new()
 var ma_btn_style_pressed := StyleBoxFlat.new()
@@ -72,6 +76,7 @@ func _process(delta):
 		
 		if scroll_timer <= 0.0:
 			_commit_scroll_undo()
+			scroll_accumulated_delta = 0.0
 
 ##------------------Handle Focus--------------------##
 
@@ -351,14 +356,16 @@ func _update_current_transform():
 		return
 	
 	var selected := _get_selected_bone_indexes()
+	
+	suppress_field_signals = true
+	
 	if selected.is_empty():
-		# Clear transform fields
 		for key in transform_fields:
 			for node in transform_fields[key]:
 				node.text = ""
+		suppress_field_signals = false
 		return
 	
-	# Use the first selected bone as the reference for UI display
 	var bone_idx: int = selected[0]
 	var transform: Transform3D = skeleton.get_bone_pose(bone_idx)
 	
@@ -381,12 +388,16 @@ func _update_current_transform():
 		nodes[2].text = str(snapped(vector_value.z, 0.001))
 	
 	if selected.size() > 1:
-		# Show mixed values since multiple bones are selected
 		for key in transform_fields:
-				for node in transform_fields[key]:
-					node.text = "---"
+			for node in transform_fields[key]:
+				node.text = "---"
+	
+	suppress_field_signals = false
 
 func _on_transform_changed(new_text: String, type: String, axis: String) -> void:
+	if suppress_field_signals:
+		return
+	
 	var val := float(new_text)
 	var selected := _get_selected_bone_indexes()
 	if selected.is_empty():
@@ -436,9 +447,15 @@ func _on_transform_submitted(new_text: String, type: String, axis: String) -> vo
 		
 		undo_redo.add_do_method(skeleton, "set_bone_pose", bone_idx, new_transform)
 		undo_redo.add_undo_method(skeleton, "set_bone_pose", bone_idx, current_transform)
+		
+	
+	undo_redo.commit_action()
 
 func _check_bone_external_transform_change():
 	if skeleton == null:
+		return
+	
+	if is_scrolling:
 		return
 	
 	var selected := _get_selected_bone_indexes()
@@ -490,22 +507,35 @@ func _apply_transform(live := true) -> void:
 		_commit_transform_with_undo(new_transform)
 
 func _apply_relative_transform_to_bone(bone_idx: int, type: String, axis: String, delta: float) -> void:
-	var transform: Transform3D = skeleton.get_bone_pose(bone_idx)
-	
-	var location := transform.origin
-	var scale := transform.basis.get_scale()
-	var euler := transform.basis.get_euler() * (180.0 / PI)
+	var source_transform: Transform3D = scroll_start_transforms.get(bone_idx, skeleton.get_bone_pose(bone_idx))
+	var location := source_transform.origin
+	var scale := source_transform.basis.get_scale()
+	var basis := source_transform.basis
 	var axis_idx := _axis_to_index(axis)
 	
 	match type:
 		"loc":
 			location[axis_idx] += delta
+		
 		"rot":
-			euler[axis_idx] += delta
+			var start_basis: Basis = scroll_start_bases.get(bone_idx, source_transform.basis.orthonormalized())
+			var rot_axis: Vector3
+			
+			match axis:
+				"x":
+					rot_axis = start_basis.x.normalized()
+				"y":
+					rot_axis = start_basis.y.normalized()
+				"z":
+					rot_axis = start_basis.z.normalized()
+				_:
+					rot_axis = Vector3.RIGHT
+			
+			basis = start_basis.rotated(rot_axis, deg_to_rad(delta))
+		
 		"sca":
 			scale[axis_idx] = max(scale[axis_idx] + delta, 0.001)
 	
-	var basis := Basis.from_euler(euler * (PI / 180.0))
 	basis = basis.scaled(scale)
 	skeleton.set_bone_pose(bone_idx, Transform3D(basis, location))
 
@@ -556,27 +586,35 @@ func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 	
 	if not is_scrolling:
 		is_scrolling = true
-		# Store starting transform from the first selected bone
+		scroll_dirty = false
+		
 		scroll_start_transforms.clear()
+		scroll_start_bases.clear()
+		scroll_current_value = 0.0
+		
 		for bone_idx in selected:
-			scroll_start_transforms[bone_idx] = skeleton.get_bone_pose(bone_idx)
+			var start_xform: Transform3D = skeleton.get_bone_pose(bone_idx)
+			scroll_start_transforms[bone_idx] = start_xform
+			scroll_start_bases[bone_idx] = start_xform.basis.orthonormalized()
 	
 	scroll_dirty = true
 	
 	if type == "rot":
-		step *= 10
+		step *= 10.0
 	else:
-		step /= 10
+		step /= 10.0
 	
-	# Apply relative transform to ALL selected bones
+	scroll_current_value += step
+	
 	for bone_idx in selected:
-		_apply_relative_transform_to_bone(bone_idx, type, axis, step)
+		_apply_relative_transform_to_bone(
+			bone_idx,
+			type,
+			axis,
+			scroll_current_value
+		)
 	
 	_update_current_transform()
-	
-	# Reset scroll debounce timer
-	# This ensures that the Undo-Redo Manager only creates an action when
-	# scrolling has stopped.
 	scroll_timer = 0.25
 
 func _commit_scroll_undo() -> void:
@@ -610,7 +648,9 @@ func _commit_scroll_undo() -> void:
 	# Reset
 	is_scrolling = false
 	scroll_dirty = false
+	scroll_current_value = 0.0
 	scroll_start_transforms.clear()
+	scroll_start_bases.clear()
 
 ##------------------Additional Setup--------------------##
 
