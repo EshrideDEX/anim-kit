@@ -242,6 +242,11 @@ metadata/_tab_name = "Location"
 
 [node name="Label" type="Label" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer" unique_id=1026131957]
 layout_mode = 2
+tooltip_text = "Mouse Wheel: Adjust value
+Ctrl + Mouse Wheel: Fine adjustment
+Type a value and press Enter to apply
+Works on all selected bones"
+mouse_filter = 1
 theme_override_font_sizes/font_size = 16
 text = "Location"
 horizontal_alignment = 1
@@ -317,6 +322,11 @@ metadata/_tab_name = "Rotation"
 
 [node name="Label" type="Label" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer2" unique_id=456462599]
 layout_mode = 2
+tooltip_text = "Mouse Wheel: Rotate by 10°
+Ctrl + Mouse Wheel: Rotate by 1°
+Type a value and press Enter to apply
+Works on all selected bones"
+mouse_filter = 1
 theme_override_font_sizes/font_size = 16
 text = "Rotate (Euler)"
 horizontal_alignment = 1
@@ -391,6 +401,11 @@ metadata/_tab_name = "Scale"
 
 [node name="Label" type="Label" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer3" unique_id=1333071049]
 layout_mode = 2
+tooltip_text = "Mouse Wheel: Adjust scale by 0.1
+Ctrl + Mouse Wheel: Fine adjustment by 0.01
+Type a value and press Enter to apply
+Works on all selected bones"
+mouse_filter = 1
 theme_override_font_sizes/font_size = 16
 text = "Scale"
 horizontal_alignment = 1
@@ -462,13 +477,13 @@ alignment = 1
 [node name="Copy" type="Button" parent="VBoxContainer/TransformPanel/HBoxContainer" unique_id=1685488718]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Copy the transform of a bone"
+tooltip_text = "Copy selected bone transforms"
 icon = SubResource("DPITexture_4qn4w")
 
 [node name="Paste" type="Button" parent="VBoxContainer/TransformPanel/HBoxContainer" unique_id=2134506023]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Paste the transform of a bone
+tooltip_text = "Paste selected bone transforms
 (Hold SHIFT to paste flipped)"
 icon = SubResource("DPITexture_vjyiu")
 
@@ -488,7 +503,7 @@ alignment = 1
 [node name="MirrorAxis" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1321473708]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Toggle between X, Y and Z axis for mirroring and copy/paste"
+tooltip_text = "Toggle between X, Y and Z axis for mirroring poses and copy/pasting"
 theme_override_styles/normal = SubResource("StyleBoxFlat_ex201")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_750p1")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ex201")
