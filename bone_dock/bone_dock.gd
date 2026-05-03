@@ -15,22 +15,24 @@ extends Control
 	"scale" : [%ScaX, %ScaY, %ScaZ],
 }
 
+# Skeleton, Transforms, and Setup
 var skeleton: Skeleton3D
 var copied_transforms: Array = []
 var edit_start_transform: Transform3D
 var editor_main_screen: Control
 
-var dragging := false
-var last_drag_x := 0
-
+# Scrolling
 var scroll_start_transforms: Dictionary = {}
 var scroll_start_bases: Dictionary = {}
+var scroll_start_scales: Dictionary = {}
+var scroll_live_scales: Dictionary = {}
 var scroll_timer: float = 0.0
 var scroll_accumulated_delta := 0.0
-var scroll_current_value := 0.0
+var scroll_current_values := {}
 var scroll_dirty := false
 var is_scrolling := false
 
+# Current State
 var bone_idxs: Array
 
 var current_location: Vector3
@@ -40,8 +42,13 @@ var current_scale: Vector3
 var mirror_axis := "x"
 var suppress_field_signals := false
 
+# Visuals
 var ma_btn_style_nrm := StyleBoxFlat.new()
 var ma_btn_style_pressed := StyleBoxFlat.new()
+
+var bone_tween: Tween
+var glow_tween: Tween
+var _hovered := false
 
 func _ready():
 	set_process(true)
@@ -63,9 +70,11 @@ func _ready():
 			
 			node.text_changed.connect(_on_transform_changed.bind(type, axis))
 			node.text_submitted.connect(_on_transform_submitted.bind(type, axis))
-			node.focus_entered.connect(_on_focus_entered.bind(node))
-			node.focus_exited.connect(_on_focus_lost.bind(node))
+			node.focus_entered.connect(_on_tfield_focus_entered.bind(node))
+			node.focus_exited.connect(_on_tfield_focus_lost.bind(node))
 			node.gui_input.connect(_on_line_edit_gui_input.bind(type, axis, node))
+
+	_set_dock_focus(false)
 
 func _process(delta):
 	_update_skeleton()
@@ -77,10 +86,22 @@ func _process(delta):
 		if scroll_timer <= 0.0:
 			_commit_scroll_undo()
 			scroll_accumulated_delta = 0.0
+	
+	var hovered := get_viewport().gui_get_hovered_control()
 
-##------------------Handle Focus--------------------##
+	var inside_dock := hovered != null and is_ancestor_of(hovered)
 
-func _on_focus_entered(node: LineEdit) -> void:
+	if inside_dock and not _hovered:
+		_hovered = true
+		_on_dock_focus_in()
+
+	elif not inside_dock and _hovered:
+		_hovered = false
+		_on_dock_focus_out()
+
+##------------------Handle Transform Field Focus--------------------##
+
+func _on_tfield_focus_entered(node: LineEdit) -> void:
 	if skeleton == null:
 		return
 		
@@ -90,7 +111,7 @@ func _on_focus_entered(node: LineEdit) -> void:
 
 	edit_start_transform = skeleton.get_bone_pose(idxs[0])
 
-func _on_focus_lost(node: LineEdit):
+func _on_tfield_focus_lost(node: LineEdit):
 	if not node.text.is_valid_float():
 		return
 	
@@ -373,6 +394,11 @@ func _update_current_transform():
 	current_scale = transform.basis.get_scale()
 	current_euler = transform.basis.get_euler() * (180.0 / PI)
 	
+	if is_scrolling and scroll_live_scales.has(bone_idx):
+		current_scale = scroll_live_scales[bone_idx]
+	else:
+		current_scale = transform.basis.get_scale()
+	
 	var data_map = {
 		"location": current_location,
 		"rotation": current_euler,
@@ -508,19 +534,18 @@ func _apply_transform(live := true) -> void:
 
 func _apply_relative_transform_to_bone(bone_idx: int, type: String, axis: String, delta: float) -> void:
 	var source_transform: Transform3D = scroll_start_transforms.get(bone_idx, skeleton.get_bone_pose(bone_idx))
-	var location := source_transform.origin
-	var scale := source_transform.basis.get_scale()
-	var basis := source_transform.basis
+	var location = source_transform.origin
+	var scale = scroll_start_scales.get(bone_idx, Vector3.ONE)
+	var start_basis = scroll_start_bases.get(bone_idx, source_transform.basis.orthonormalized())
 	var axis_idx := _axis_to_index(axis)
-	
+
 	match type:
 		"loc":
 			location[axis_idx] += delta
-		
+
 		"rot":
-			var start_basis: Basis = scroll_start_bases.get(bone_idx, source_transform.basis.orthonormalized())
 			var rot_axis: Vector3
-			
+
 			match axis:
 				"x":
 					rot_axis = start_basis.x.normalized()
@@ -530,12 +555,17 @@ func _apply_relative_transform_to_bone(bone_idx: int, type: String, axis: String
 					rot_axis = start_basis.z.normalized()
 				_:
 					rot_axis = Vector3.RIGHT
-			
-			basis = start_basis.rotated(rot_axis, deg_to_rad(delta))
-		
+
+			start_basis = start_basis.rotated(rot_axis, deg_to_rad(delta))
+
 		"sca":
 			scale[axis_idx] = max(scale[axis_idx] + delta, 0.001)
+			scale = scale.max(Vector3(0.001, 0.001, 0.001))
 	
+	scroll_live_scales[bone_idx] = scale
+	
+	var rot = start_basis.get_rotation_quaternion()
+	var basis = Basis(rot)
 	basis = basis.scaled(scale)
 	skeleton.set_bone_pose(bone_idx, Transform3D(basis, location))
 
@@ -587,15 +617,18 @@ func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 	if not is_scrolling:
 		is_scrolling = true
 		scroll_dirty = false
+		scroll_current_values.clear()
 		
 		scroll_start_transforms.clear()
 		scroll_start_bases.clear()
-		scroll_current_value = 0.0
+		scroll_start_scales.clear()
+		scroll_live_scales.clear()
 		
 		for bone_idx in selected:
 			var start_xform: Transform3D = skeleton.get_bone_pose(bone_idx)
 			scroll_start_transforms[bone_idx] = start_xform
 			scroll_start_bases[bone_idx] = start_xform.basis.orthonormalized()
+			scroll_start_scales[bone_idx] = start_xform.basis.get_scale()
 	
 	scroll_dirty = true
 	
@@ -604,15 +637,12 @@ func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 	else:
 		step /= 10.0
 	
-	scroll_current_value += step
+	var key := "%s_%s" % [type, axis]
+	scroll_current_values[key] = scroll_current_values.get(key, 0.0) + step
+	var delta: float = scroll_current_values[key]
 	
 	for bone_idx in selected:
-		_apply_relative_transform_to_bone(
-			bone_idx,
-			type,
-			axis,
-			scroll_current_value
-		)
+		_apply_relative_transform_to_bone(bone_idx, type, axis, delta)
 	
 	_update_current_transform()
 	scroll_timer = 0.25
@@ -648,9 +678,57 @@ func _commit_scroll_undo() -> void:
 	# Reset
 	is_scrolling = false
 	scroll_dirty = false
-	scroll_current_value = 0.0
+	scroll_current_values.clear()
 	scroll_start_transforms.clear()
 	scroll_start_bases.clear()
+	scroll_start_scales.clear()
+	scroll_live_scales.clear()
+
+##------------------Effects------------------##
+
+func _on_dock_focus_in() -> void:
+	_set_dock_focus(true)
+
+func _on_dock_focus_out() -> void:
+	_set_dock_focus(false)
+
+func _set_dock_focus(active: bool) -> void:
+	if bone_tween:
+		bone_tween.kill()
+	
+	bone_tween = create_tween()
+
+	if active:
+		bone_tween.tween_property(
+			self,
+			"modulate",
+			Color(1, 1, 1, 0.95),
+			0.12
+		).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+		bone_tween.parallel().tween_property(
+			self,
+			"scale",
+			Vector2(1.01, 1.01),
+			0.12
+		)
+		
+	else:
+		bone_tween.tween_property(
+			self,
+			"modulate",
+			Color(0.445, 0.534, 0.542, 0.4),
+			0.15
+		)
+
+		bone_tween.parallel().tween_property(
+			self,
+			"scale",
+			Vector2(1, 1),
+			0.15
+		)
+
+
 
 ##------------------Additional Setup--------------------##
 
