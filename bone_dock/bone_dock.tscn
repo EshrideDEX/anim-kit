@@ -79,7 +79,7 @@ expand_margin_top = 2.0
 expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
-[sub_resource type="DPITexture" id="DPITexture_vjyiu"]
+[sub_resource type="DPITexture" id="DPITexture_4qn4w"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M2 1a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h1V3h9V2a1 1 0 0 0-1-1zm3 3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zm1 2h7v7H6z\"/></svg>
 "
 saturation = 2.0
@@ -89,7 +89,7 @@ Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
 Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
 }
 
-[sub_resource type="DPITexture" id="DPITexture_ex201"]
+[sub_resource type="DPITexture" id="DPITexture_vjyiu"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M2 3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-3.184a3 3 0 0 0-5.632 0zm6 0a1 1 0 0 1 0 2 1 1 0 0 1 0-2zM3 5h2v2h6V5h2v8H3z\"/></svg>
 "
 saturation = 2.0
@@ -99,14 +99,14 @@ Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
 Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
 }
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_750p1"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ex201"]
 bg_color = Color(1, 0.282, 0.361, 0.9)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_afm7y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_750p1"]
 bg_color = Color(1, 0.441, 0.47, 0.9)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
@@ -160,7 +160,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="DPITexture" id="DPITexture_sryhh"]
+[sub_resource type="DPITexture" id="DPITexture_afm7y"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 4h12v4H2zm12 6v4H2v-4z\"/></svg>
 "
 saturation = 2.0
@@ -170,8 +170,19 @@ Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
 Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
 }
 
+[sub_resource type="DPITexture" id="DPITexture_sryhh"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"none\" stroke=\"#e0e0e0\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 11V4L4 8m4-4 4 4\"/></svg>
+"
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
 [node name="BoneDock" type="Control" unique_id=912353562]
-modulate = Color(0.433, 0.574, 0.6, 0.4)
+visible = false
+modulate = Color(0.445, 0.534, 0.542, 0.4)
 self_modulate = Color(0.85, 0.85, 0.85, 1)
 layout_mode = 3
 anchors_preset = 15
@@ -472,46 +483,46 @@ text = "0.00"
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TransformPanel" unique_id=496620267]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=496620267]
 layout_mode = 2
 alignment = 1
 
-[node name="Copy" type="Button" parent="VBoxContainer/TransformPanel/HBoxContainer" unique_id=1685488718]
+[node name="Copy" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1685488718]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Copy selected bone transforms"
-icon = SubResource("DPITexture_vjyiu")
+icon = SubResource("DPITexture_4qn4w")
 
-[node name="Paste" type="Button" parent="VBoxContainer/TransformPanel/HBoxContainer" unique_id=2134506023]
+[node name="Paste" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2134506023]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Paste selected bone transforms
 (Hold SHIFT to paste flipped)"
-icon = SubResource("DPITexture_ex201")
+icon = SubResource("DPITexture_vjyiu")
 
-[node name="SelectionLabel" type="Label" parent="VBoxContainer/TransformPanel" unique_id=1559039921]
+[node name="SelectionLabel" type="Label" parent="VBoxContainer" unique_id=1559039921]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "No Bones Selected"
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=673465804]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=673465804]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
 alignment = 1
 
-[node name="MirrorAxis" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1321473708]
+[node name="MirrorAxis" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=1321473708]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Toggle between X, Y and Z axis for mirroring poses and copy/pasting"
-theme_override_styles/normal = SubResource("StyleBoxFlat_750p1")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_afm7y")
-theme_override_styles/hover = SubResource("StyleBoxFlat_750p1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ex201")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_750p1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ex201")
 text = " X "
 
-[node name="PoseMirror" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2055353057]
+[node name="PoseMirror" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=2055353057]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(38, 38)
 layout_mode = 2
@@ -525,17 +536,28 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_3mnc0")
 icon = ExtResource("2_itgml")
 expand_icon = true
 
-[node name="TransP" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=933207483]
+[node name="TransP" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=933207483]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Toggle the Transform Panel"
 theme_override_font_sizes/font_size = 12
 toggle_mode = true
+icon = SubResource("DPITexture_afm7y")
+
+[node name="Collapse" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=1230100295]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+tooltip_text = "Collapse Bone Dock"
+theme_override_font_sizes/font_size = 12
+toggle_mode = true
+button_pressed = true
 icon = SubResource("DPITexture_sryhh")
 
 [connection signal="item_selected" from="VBoxContainer/ScrollContainer/BoneList" to="." method="_on_bone_selected"]
-[connection signal="pressed" from="VBoxContainer/TransformPanel/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
-[connection signal="gui_input" from="VBoxContainer/TransformPanel/HBoxContainer/Paste" to="." method="_on_paste_button_gui_input"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/MirrorAxis" to="." method="_on_mirror_axis_btn_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/PoseMirror" to="." method="_mirror_full_pose"]
-[connection signal="toggled" from="VBoxContainer/HBoxContainer/TransP" to="." method="_on_transform_panel_btn_toggled"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Copy" to="." method="_on_copy_pressed"]
+[connection signal="gui_input" from="VBoxContainer/HBoxContainer/Paste" to="." method="_on_paste_button_gui_input"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/MirrorAxis" to="." method="_on_mirror_axis_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/PoseMirror" to="." method="_mirror_full_pose"]
+[connection signal="toggled" from="VBoxContainer/HBoxContainer2/TransP" to="." method="_on_transform_panel_btn_toggled"]
+[connection signal="toggled" from="VBoxContainer/HBoxContainer2/Collapse" to="." method="_on_collapse_btn_pressed"]

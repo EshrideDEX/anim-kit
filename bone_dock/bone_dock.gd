@@ -7,6 +7,8 @@ extends Control
 @onready var paste_btn: Button = %Paste
 @onready var trans_p_btn: Button = %TransP
 @onready var mirror_axis_btn: Button = %MirrorAxis
+@onready var pose_mirror_btn: Button = %PoseMirror
+@onready var collapse_btn: Button = %Collapse
 @onready var selection_label: Label = %SelectionLabel
 
 @onready var transform_fields = {
@@ -728,18 +730,43 @@ func _set_dock_focus(active: bool) -> void:
 			0.15
 		)
 
-
-
 ##------------------Additional Setup--------------------##
 
 func _on_transform_panel_btn_toggled(pressed: bool) -> void:
+	if !bone_list.visible:
+		return
+	
 	transform_panel.visible = pressed
+	collapse_btn.disabled = pressed
+
+func _on_collapse_btn_pressed(pressed: bool):
+	if transform_panel.visible:
+		return
+	
+	if !pressed:
+		collapse_btn.icon = editor_main_screen.get_theme_icon("ArrowDown", "EditorIcons")
+		collapse_btn.tooltip_text = "Collapse Bone Dock"
+		$VBoxContainer/HBoxContainer2.alignment = BoxContainer.ALIGNMENT_CENTER
+	else:
+		collapse_btn.icon = editor_main_screen.get_theme_icon("ArrowUp", "EditorIcons")
+		collapse_btn.tooltip_text = "Expand Bone Dock"
+		$VBoxContainer/HBoxContainer2.alignment = BoxContainer.ALIGNMENT_END
+	
+	bone_list.visible = !pressed
+	$VBoxContainer/HBoxContainer.visible = !pressed
+	selection_label.visible = !pressed
+	mirror_axis_btn.visible = !pressed
+	pose_mirror_btn.visible = !pressed
+	trans_p_btn.visible = !pressed
 
 func _setup_buttons():
 	copy_btn.icon = editor_main_screen.get_theme_icon("ActionCopy", "EditorIcons")
 	paste_btn.icon = editor_main_screen.get_theme_icon("ActionPaste", "EditorIcons")
 	trans_p_btn.text = ""
 	trans_p_btn.icon = editor_main_screen.get_theme_icon("Panels2", "EditorIcons")
+	collapse_btn.text = ""
+	collapse_btn.icon = editor_main_screen.get_theme_icon("ArrowUp", "EditorIcons")
+	collapse_btn.button_pressed = false
 
 	copy_btn.text = ""
 	paste_btn.text = ""
