@@ -647,7 +647,9 @@ func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 		_apply_relative_transform_to_bone(bone_idx, type, axis, delta)
 	
 	_update_current_transform()
-	scroll_timer = 0.25
+	
+	# Scroll debounce timer
+	scroll_timer = 0.5
 
 func _commit_scroll_undo() -> void:
 	if not scroll_dirty:
