@@ -4,24 +4,24 @@ Tired Godot's current armature workflow? Well, it just got an upgrade! This plug
 
 ![AnimKit Use Example](./example/example.png)
 
-## Current features (v1.0 Beta)
-| Euler Rotation Editing | Copy/Paste Transforms |
+## ✨ Current features (v1.0 Beta)
+| Multi-Bone Transforms | Copy/Paste Transforms |
 | :--- | :--- |
-| <img width="390" alt="Euler" src="./example/example_movie_1.gif" /> | <img width="390" alt="CopyPaste" src="./example/example_movie_2.gif" /> |
+| <img width="390" alt="Euler" src="./example/example_movie_5.gif" /> | <img width="390" alt="CopyPaste" src="./example/example_movie_2.gif" /> |
 | **Pose Library** | **Full Pose Mirroring** |
 | <img width="390" alt="PoseLib" src="./example/example_movie_3.gif" /> | <img width="390" alt="Mirror" src="./example/example_movie_4.gif" /> |
 
-- Bone dock for editing transforms with euler rotation editing
-- Copy/paste bone transforms
+- Bone dock for editing multiple transforms at once including euler rotation editing
+- Copy/paste multiple bone transforms
 - Working Pose Library for saving and loading poses
 - Mirroring full poses
 
-## Planned features
+## 🚧 Planned features
 - Hide/Isolate bones
 - Mirroring full animations
-- More cutscene animation tools
+- Expanded tools for cutscene and cinematic animation workflows
 
-## Installation
+## ⚙️ Installation
 1. Copy the `anim_kit/` folder into your Godot project’s `addons/` folder
 2. Enable the plugin in Project → Project Settings → Plugins
 
