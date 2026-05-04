@@ -287,6 +287,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 emoji_menu_enabled = false
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer/HBoxContainer" unique_id=1611602337]
@@ -304,6 +305,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer/HBoxContainer" unique_id=1162606662]
 layout_mode = 2
@@ -320,6 +322,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer" unique_id=772575088]
 modulate = Color(1, 1, 1, 0)
@@ -367,6 +370,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer2/HBoxContainer" unique_id=1048863727]
 layout_mode = 2
@@ -383,6 +387,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer2/HBoxContainer" unique_id=1692547471]
 layout_mode = 2
@@ -399,6 +404,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer2" unique_id=1243803751]
 modulate = Color(1, 1, 1, 0)
@@ -446,6 +452,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer3/HBoxContainer" unique_id=1199469759]
 layout_mode = 2
@@ -462,6 +469,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer3/HBoxContainer" unique_id=383789471]
 layout_mode = 2
@@ -478,6 +486,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "0.00"
+max_length = 24
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer/TransformPanel/TabContainer/VBoxContainer3" unique_id=808331562]
 modulate = Color(1, 1, 1, 0)
@@ -503,6 +512,8 @@ icon = SubResource("DPITexture_vjyiu")
 [node name="SelectionLabel" type="Label" parent="VBoxContainer" unique_id=1559039921]
 unique_name_in_owner = true
 layout_mode = 2
+tooltip_text = "Use Ctrl + I (or Cmd + I) to invert current bone selection"
+mouse_filter = 1
 theme_override_font_sizes/font_size = 12
 text = "No Bones Selected"
 horizontal_alignment = 1

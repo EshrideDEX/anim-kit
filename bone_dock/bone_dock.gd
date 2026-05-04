@@ -75,7 +75,9 @@ func _ready():
 			node.focus_entered.connect(_on_tfield_focus_entered.bind(node))
 			node.focus_exited.connect(_on_tfield_focus_lost.bind(node))
 			node.gui_input.connect(_on_line_edit_gui_input.bind(type, axis, node))
-
+			
+			node.max_length = 24
+	
 	_set_dock_focus(false)
 
 func _process(delta):
@@ -101,7 +103,7 @@ func _process(delta):
 		_hovered = false
 		_on_dock_focus_out()
 
-##------------------Handle Transform Field Focus--------------------##
+##--------------------Handle Transform Field Focus--------------------##
 
 func _on_tfield_focus_entered(node: LineEdit) -> void:
 	if skeleton == null:
@@ -119,7 +121,7 @@ func _on_tfield_focus_lost(node: LineEdit):
 	
 	_apply_transform(false)
 
-##------------------Updates--------------------##
+##--------------------Updates--------------------##
 
 func _update_skeleton():
 	var skeleton_selected = false
@@ -156,7 +158,7 @@ func _update_selection_info():
 		else:
 			selection_label.text = str(selected.size()) + " bones selected"
 
-##------------------Bone Selection--------------------##
+##--------------------Bone Selection--------------------##
 
 func _get_selected_bone_indexes() -> Array:
 	var selected = bone_list.get_selected_items()
@@ -169,7 +171,7 @@ func _on_bone_selection_changed(index: int = -1, selected: bool = false) -> void
 	_update_current_transform()
 	_update_selection_info()
 
-##------------------Copy/Paste--------------------##
+##--------------------Copy/Paste--------------------##
 
 func _on_copy_pressed() -> void:
 	if skeleton == null:
@@ -258,7 +260,7 @@ func _on_paste_button_gui_input(event: InputEvent) -> void:
 		else:
 			_on_paste_pressed()
 
-##------------------Bone/Pose Mirroring--------------------##
+##--------------------Bone/Pose Mirroring--------------------##
 
 func _mirror_full_pose() -> void:
 	if skeleton == null or not is_instance_valid(skeleton):
@@ -372,7 +374,7 @@ func _on_mirror_axis_btn_pressed() -> void:
 			ma_btn_style_nrm.set_bg_color(Color(1.0, 0.282, 0.361, 0.9))
 			ma_btn_style_pressed.set_bg_color(Color(1.0, 0.441, 0.47, 0.9))
 
-##------------------Handle Transforms--------------------##
+##--------------------Handle Transforms--------------------##
 
 func _update_current_transform():
 	if skeleton == null:
@@ -426,6 +428,12 @@ func _on_transform_changed(new_text: String, type: String, axis: String) -> void
 	if suppress_field_signals:
 		return
 	
+	if new_text.is_empty() or new_text == "-" or new_text == "." or new_text == "-.":
+		return
+
+	if not new_text.is_valid_float():
+		return
+	
 	var val := float(new_text)
 	var selected := _get_selected_bone_indexes()
 	if selected.is_empty():
@@ -445,6 +453,9 @@ func _on_transform_changed(new_text: String, type: String, axis: String) -> void
 		_apply_transform(true)
 
 func _on_transform_submitted(new_text: String, type: String, axis: String) -> void:
+	if not new_text.is_valid_float():
+		return
+	
 	var val := float(new_text)
 	var selected := _get_selected_bone_indexes()
 	if selected.is_empty():
@@ -600,7 +611,7 @@ func _commit_transform_with_undo(new_transform: Transform3D) -> void:
 	undo_redo.add_undo_method(self, "_update_current_transform")
 	undo_redo.commit_action()
 
-##------------------Gestures--------------------##
+##--------------------Gestures--------------------##
 
 func _on_line_edit_gui_input(event: InputEvent, type: String, axis: String, node: LineEdit) -> void:
 	if event is InputEventMouseButton:
@@ -610,6 +621,26 @@ func _on_line_edit_gui_input(event: InputEvent, type: String, axis: String, node
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			var step = 0.1 if event.ctrl_pressed else 1.0
 			_increment_field(node, type, axis, -step)
+
+##--------------------Shortcuts--------------------##
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_I and event.is_command_or_control_pressed():
+			var focus_owner := get_viewport().gui_get_focus_owner()
+			if focus_owner is LineEdit:
+				return
+			
+			_invert_bone_list_selection()
+
+func _invert_bone_list_selection() -> void:
+	for i in range(bone_list.get_item_count()):
+		if bone_list.is_selected(i):
+			bone_list.deselect(i)
+		else:
+			bone_list.select(i, false)
+
+##--------------------Scroll Incrementing--------------------##
 
 func _increment_field(node: LineEdit, type: String, axis: String, step: float):
 	var selected := _get_selected_bone_indexes()
@@ -732,19 +763,15 @@ func _set_dock_focus(active: bool) -> void:
 			0.15
 		)
 
-##------------------Additional Setup--------------------##
+##--------------------Additional Setup--------------------##
 
 func _on_transform_panel_btn_toggled(pressed: bool) -> void:
 	if !bone_list.visible:
 		return
 	
 	transform_panel.visible = pressed
-	collapse_btn.disabled = pressed
 
 func _on_collapse_btn_pressed(pressed: bool):
-	if transform_panel.visible:
-		return
-	
 	if !pressed:
 		collapse_btn.icon = editor_main_screen.get_theme_icon("ArrowDown", "EditorIcons")
 		collapse_btn.tooltip_text = "Collapse Bone Dock"
@@ -760,6 +787,7 @@ func _on_collapse_btn_pressed(pressed: bool):
 	mirror_axis_btn.visible = !pressed
 	pose_mirror_btn.visible = !pressed
 	trans_p_btn.visible = !pressed
+	transform_panel.visible = !pressed
 
 func _setup_buttons():
 	copy_btn.icon = editor_main_screen.get_theme_icon("ActionCopy", "EditorIcons")
@@ -768,7 +796,7 @@ func _setup_buttons():
 	trans_p_btn.icon = editor_main_screen.get_theme_icon("Panels2", "EditorIcons")
 	collapse_btn.text = ""
 	collapse_btn.icon = editor_main_screen.get_theme_icon("ArrowUp", "EditorIcons")
-	collapse_btn.button_pressed = false
+	
 
 	copy_btn.text = ""
 	paste_btn.text = ""

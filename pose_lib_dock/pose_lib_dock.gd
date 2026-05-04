@@ -258,6 +258,16 @@ func _refresh_pose_buttons() -> void:
 	
 	pose_list.move_child(new_pose_btn, -1)
 
+##------------------Shortcuts--------------------##
+
+func _on_pose_popup_window_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_I and event.is_command_or_control_pressed():
+			_invert_bone_list_selection()
+			get_viewport().set_input_as_handled() 
+		if event.is_action_pressed("ui_accept"):
+			_on_confirm_create_pressed()
+
 ##------------------Helpers------------------##
 
 func _set_skeleton(new_skeleton: Skeleton3D) -> void:
@@ -289,6 +299,13 @@ func _get_skeleton_id() -> String:
 func _generate_uuid() -> String:
 	return "%s_%s" % [Time.get_unix_time_from_system(), randi()]
 
+func _invert_bone_list_selection() -> void:
+	for i in range(bone_list.get_item_count()):
+		if bone_list.is_selected(i):
+			bone_list.deselect(i)
+		else:
+			bone_list.select(i, false)
+
 ##------------------Additional Setup--------------------##
 
 func _setup_buttons() -> void:
@@ -307,6 +324,7 @@ func _on_confirm_create_pressed() -> void:
 
 func _setup_popups() -> void:
 	new_pose_popup = PopupPanel.new()
+	new_pose_popup.window_input.connect(_on_pose_popup_window_input)
 	
 	var vbox = VBoxContainer.new()
 	new_pose_popup.add_child(vbox)
@@ -323,25 +341,36 @@ func _setup_popups() -> void:
 	scroll_cont.add_child(bone_list)
 	vbox.add_child(scroll_cont)
 	
+	var hbox_top = HBoxContainer.new()
 	new_pose_name_field = LineEdit.new()
 	new_pose_name_field.placeholder_text = "Enter pose name..."
+	new_pose_name_field.mouse_filter = Control.MOUSE_FILTER_PASS
+	new_pose_name_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	new_pose_name_field.text_submitted.connect(_on_confirm_create_pose)
-	vbox.add_child(new_pose_name_field)
+	hbox_top.add_child(new_pose_name_field)
+	var info_icn = TextureRect.new()
+	info_icn.texture = editor_main_screen.get_theme_icon("NodeInfo", "EditorIcons")
+	info_icn.tooltip_text = "Use Ctrl + I (or Cmd + I) to invert current bone selection"
+	info_icn.custom_minimum_size = Vector2(16, 16)
+	info_icn.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	info_icn.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	hbox_top.add_child(info_icn)
+	vbox.add_child(hbox_top)
 	
-	var hbox = HBoxContainer.new()
+	var hbox_bottom = HBoxContainer.new()
 	var confirm_btn = Button.new()
 	confirm_btn.text = "Create"
 	confirm_btn.pressed.connect(_on_confirm_create_pressed)
-	hbox.add_child(confirm_btn)
+	hbox_bottom.add_child(confirm_btn)
 	var clear_btn = Button.new()
 	clear_btn.text = "Clear"
 	clear_btn.pressed.connect(_on_clear_bone_list_selection)
-	hbox.add_child(clear_btn)
+	hbox_bottom.add_child(clear_btn)
 	var cancel_btn = Button.new()
 	cancel_btn.text = "Cancel"
 	cancel_btn.pressed.connect(_on_cancel_create_pose)
-	hbox.add_child(cancel_btn)
+	hbox_bottom.add_child(cancel_btn)
 	
-	vbox.add_child(hbox)
+	vbox.add_child(hbox_bottom)
 	
 	add_child(new_pose_popup)
